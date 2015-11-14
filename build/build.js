@@ -81,10 +81,10 @@
 	      id: v.id,
 	      title: v.title,
 	      user_url: v.user_url,
-	      user_name: v.user_name
+	      user_name: v.user_name,
+	      description: v.description
 	    });
 	  });
-	  console.log(info);
 	  render(info);
 	}
 
@@ -21099,6 +21099,7 @@
 	        title: obj.title,
 	        user_url: obj.user_url,
 	        user_name: obj.user_name,
+	        description: obj.description,
 	        width: _this.props.width,
 	        height: _this.props.height
 	      });
@@ -21275,9 +21276,17 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _reactDom = __webpack_require__(158);
+
+	var _reactDom2 = _interopRequireDefault(_reactDom);
+
 	var _rDom = __webpack_require__(164);
 
 	var _rDom2 = _interopRequireDefault(_rDom);
+
+	var _classnames = __webpack_require__(168);
+
+	var _classnames2 = _interopRequireDefault(_classnames);
 
 	var _reactLazyLoad = __webpack_require__(167);
 
@@ -21290,10 +21299,34 @@
 	  // propTypes:{
 	  //   id: React.propTypes.number
 	  // },
+	  getInitialState: function getInitialState() {
+	    return {
+	      overFlowHidden: false
+	    };
+	  },
+
+	  componentDidMount: function componentDidMount() {
+	    var scrollHeight = _reactDom2['default'].findDOMNode(this.refs[this.props.id]).scrollHeight;
+	    if (scrollHeight > 200) {
+	      this.setState({
+	        overFlowHidden: true
+	      });
+	    }
+	  },
+
+	  learnMore: function learnMore() {
+	    this.setState({
+	      overFlowHidden: false
+	    });
+	  },
 
 	  render: function render() {
 	    var url = "https://player.vimeo.com/video/" + this.props.id;
 	    //+ '?badge=0&autopause=0&player_id=0'
+	    var overLayStyle = {
+	      display: this.state.overFlowHidden ? 'block' : 'none',
+	      width: this.props.width
+	    };
 
 	    return _react2['default'].createElement(
 	      'div',
@@ -21306,29 +21339,27 @@
 	          width: this.props.width,
 	          height: this.props.height,
 	          frameBorder: '0',
-	          webkitallowfullscreen: true, mozallowfullscreen: true, allowfFullScreen: true }),
+	          webkitallowfullscreen: true, mozallowfullscreen: true, allowfFullScreen: true })
+	      ),
+	      _react2['default'].createElement(
+	        'div',
+	        { className: 'wrap' },
+	        _react2['default'].createElement('div', {
+	          ref: this.props.id,
+	          className: (0, _classnames2['default'])("info", { "info_hide": this.state.overFlowHidden }),
+	          dangerouslySetInnerHTML: { __html: this.props.description } }),
 	        _react2['default'].createElement(
-	          'p',
-	          null,
+	          'div',
+	          {
+	            className: 'overlay',
+	            style: overLayStyle },
 	          _react2['default'].createElement(
-	            'a',
-	            { href: 'https://vimeo.com/143806678' },
-	            this.props.title
-	          ),
-	          ' from ',
-	          _react2['default'].createElement(
-	            'a',
-	            { href: this.props.user_url },
-	            this.props.user_name,
-	            ' '
-	          ),
-	          ' on ',
-	          _react2['default'].createElement(
-	            'a',
-	            { href: 'https://vimeo.com' },
-	            'Vimeo'
-	          ),
-	          '.'
+	            'span',
+	            {
+	              className: 'learnMore',
+	              onClick: this.learnMore },
+	            'Read More...'
+	          )
 	        )
 	      )
 	    );

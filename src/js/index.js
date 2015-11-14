@@ -20,10 +20,10 @@ function cb(body){
       id: v.id,
       title: v.title,
       user_url: v.user_url,
-      user_name: v.user_name
+      user_name: v.user_name,
+      description: v.description
     })
   })
-  console.log(info)
   render(info)
 }
 

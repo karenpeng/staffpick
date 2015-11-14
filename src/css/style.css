@@ -5,13 +5,48 @@ html, body{
   padding: 0;
   background-image: url(https://f.vimeocdn.com/images_v6/staffpicks_bg.jpg);
   color: white;
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 
 #container{
-  max-width: 960px;
+  width: 960px;
   margin: 0 auto;
 }
 
 .item{
-  margin: 100px 0;
+  margin: 40px 0;
+  background-color: #222;
+}
+
+.wrap{
+  position: relative;
+}
+
+.info{
+  padding: 16px;
+  background-image: #222;
+  color: #a7a7a7;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.info_hide{
+  max-height: 200px;
+  overflow: hidden;
+}
+
+.overlay{
+  position: absolute;
+  bottom: 0;
+  opacity: 0.7;
+  background-image: -webkit-linear-gradient(top,rgba(34,34,34,0)0,rgba(34,34,34,0.5)20%, rgba(34,34,34,1) 100%) !important;
+  color: white;
+  height: 100px;
+}
+
+.learnMore{
+  cursor: pointer;
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
 }

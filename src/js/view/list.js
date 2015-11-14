@@ -21,6 +21,7 @@ const MyList = React.createClass({
         title={obj.title}
         user_url={obj.user_url}
         user_name={obj.user_name}
+        description={obj.description}
         width={this.props.width}
         height={this.props.height}
       ></MyVideo>
