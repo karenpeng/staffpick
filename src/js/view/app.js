@@ -38,8 +38,8 @@ const App = React.createClass({
       <div>
         <img src="https://i.vimeocdn.com/channel/289181_980?mh=250" alt="Vimeo Staff Picks" />
         <div className="filter" onClick={this.handleSort}>
-          Sort By:   <button id="playsBtn">Plays</button>
-          <button id="likesBtn">Likes</button>
+          Sort By   <button id="playsBtn">Plays</button>
+          <button id="likesBtn">ikes</button>
           <button id="commentsBtn">Comments</button>
           <button id="durationsBtn">Duration</button>
         </div>

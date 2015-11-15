@@ -21147,7 +21147,7 @@
 	      _react2['default'].createElement(
 	        'div',
 	        { className: 'filter', onClick: this.handleSort },
-	        'Sort By:   ',
+	        'Sort By   ',
 	        _react2['default'].createElement(
 	          'button',
 	          { id: 'playsBtn' },
@@ -21156,7 +21156,7 @@
 	        _react2['default'].createElement(
 	          'button',
 	          { id: 'likesBtn' },
-	          'Likes'
+	          'ikes'
 	        ),
 	        _react2['default'].createElement(
 	          'button',
@@ -21206,6 +21206,7 @@
 	  //   height: React.propTypes.number,
 	  //   maxHeight: React.propTypes.number
 	  // },
+	  getFocus: function getFocus() {},
 
 	  render: function render() {
 	    var _this = this;
@@ -21216,8 +21217,8 @@
 	        key: obj.id,
 	        width: _this.props.width,
 	        height: _this.props.height,
-	        maxHeight: _this.props.maxHeight
-	      });
+	        maxHeight: _this.props.maxHeight,
+	        getFocus: _this.getFocus });
 	    });
 
 	    return _react2['default'].createElement(
@@ -21242,6 +21243,10 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _reactDom = __webpack_require__(158);
+
+	var _reactDom2 = _interopRequireDefault(_reactDom);
+
 	var _classnames = __webpack_require__(167);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
@@ -21264,6 +21269,27 @@
 	  //   height: React.propTypes.number,
 	  //   maxHeight: React.propTypes.number
 	  // },
+	  onWindowScroll: function onWindowScroll() {
+	    var n = _reactDom2['default'].findDOMNode(this);
+	    console.dir(n.id);
+	    // const threshold = ReactDom.findDOMNode(this).scrollHeight
+	    // const bounds = ReactDom.findDOMNode(this).getBoundingClientRect()
+	    // console.log(bounds)
+	    // const scrollTop = window.pageYOffset
+	    // const top = bounds.top + scrollTop
+	    // const height = bounds.bottom - bounds.top
+
+	    // if (top === 0 || (top <= (scrollTop + window.innerHeight + threshold)
+	    //                   && (top + height) > (scrollTop - threshold))) {
+	    //   this.setState({ visible: true });
+	    //   this.onVisible();
+	    // }
+	    this.props.getFocus(n.id);
+	  },
+
+	  componentDidMount: function componentDidMount() {
+	    window.addEventListener('scroll', this.onWindowScroll);
+	  },
 
 	  render: function render() {
 	    var url = "https://player.vimeo.com/video/" + this.props.obj.id;
@@ -21271,7 +21297,7 @@
 
 	    return _react2['default'].createElement(
 	      'div',
-	      { className: 'item' },
+	      { className: 'item', id: this.props.obj.id, ref: this.props.id },
 	      _react2['default'].createElement(
 	        _reactLazyLoad2['default'],
 	        { height: this.props.height },
@@ -21283,8 +21309,6 @@
 	          webkitallowfullscreen: true, mozallowfullscreen: true, allowfFullScreen: true })
 	      ),
 	      _react2['default'].createElement(_info2['default'], {
-	        id: this.props.obj.id,
-	        ref: this.props.obj.id,
 	        description: this.props.obj.description,
 	        likes: this.props.obj.likes,
 	        plays: this.props.obj.plays,
@@ -21546,7 +21570,7 @@
 	  },
 
 	  componentDidMount: function componentDidMount() {
-	    var scrollHeight = _reactDom2['default'].findDOMNode(this.refs[this.props.id]).scrollHeight;
+	    var scrollHeight = _reactDom2['default'].findDOMNode(this).scrollHeight;
 	    if (scrollHeight > this.props.maxHeight) {
 	      this.setState({
 	        overFlowHidden: true
@@ -21570,7 +21594,6 @@
 	      'div',
 	      { className: 'wrap' },
 	      _react2['default'].createElement('div', {
-	        ref: this.props.id,
 	        className: (0, _classnames2['default'])("info", { "info_hide": this.state.overFlowHidden }),
 	        dangerouslySetInnerHTML: { __html: this.props.description } }),
 	      _react2['default'].createElement(

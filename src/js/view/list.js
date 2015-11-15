@@ -13,6 +13,9 @@ const List = React.createClass({
   //   height: React.propTypes.number,
   //   maxHeight: React.propTypes.number
   // },
+  getFocus(){
+
+  },
 
   render(){
 
@@ -23,7 +26,7 @@ const List = React.createClass({
         width={this.props.width}
         height={this.props.height}
         maxHeight={this.props.maxHeight}
-      ></Item>
+        getFocus={this.getFocus}></Item>
     })
 
     return (

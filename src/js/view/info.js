@@ -27,7 +27,7 @@ const Info = React.createClass({
   },
 
   componentDidMount(){
-    let scrollHeight = ReactDom.findDOMNode(this.refs[this.props.id]).scrollHeight
+    let scrollHeight = ReactDom.findDOMNode(this).scrollHeight
     if(scrollHeight > this.props.maxHeight){
       this.setState({
         overFlowHidden: true
@@ -50,8 +50,7 @@ const Info = React.createClass({
     return (
      
       <div className="wrap">
-        <div 
-         ref={this.props.id}
+        <div
          className={classNames("info", {"info_hide" : this.state.overFlowHidden })}
          dangerouslySetInnerHTML={{__html:this.props.description}}>
         </div>
