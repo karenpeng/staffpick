@@ -3,9 +3,10 @@
 import React from 'react'
 import ReactDom from 'react-dom'
 import classNames from 'classnames'
-import LazyLoad from 'react-lazy-load'
+import LazyLoad from './lazyLoad'
 import Info from './info'
 
+console.dir(LazyLoad)
 const Item = React.createClass({
 
   displayName: 'Item',
@@ -16,26 +17,17 @@ const Item = React.createClass({
   //   height: React.propTypes.number,
   //   maxHeight: React.propTypes.number
   // },
-  onWindowScroll(){
-    const n = ReactDom.findDOMNode(this)
-    console.dir(n.id)
-    // const threshold = ReactDom.findDOMNode(this).scrollHeight
-    // const bounds = ReactDom.findDOMNode(this).getBoundingClientRect()
-    // console.log(bounds)
-    // const scrollTop = window.pageYOffset
-    // const top = bounds.top + scrollTop
-    // const height = bounds.bottom - bounds.top
 
-    // if (top === 0 || (top <= (scrollTop + window.innerHeight + threshold)
-    //                   && (top + height) > (scrollTop - threshold))) {
-    //   this.setState({ visible: true });
-    //   this.onVisible();
-    // }
-    this.props.getFocus(n.id)
-  },
-
-  componentDidMount(){
-    window.addEventListener('scroll', this.onWindowScroll)
+  msg(){
+    const ifr = ReactDom.findDOMNode(this.refs[this.props.obj.id])
+    if(ifr !== null){
+      console.dir(ifr)
+      console.log('stop')
+      var obj = {
+        'method': 'pause'
+      }
+      ifr.contentWindow.postMessage(JSON.stringify(obj), ifr.src)
+    }
   },
 
   render(){
@@ -43,14 +35,22 @@ const Item = React.createClass({
       //+ '?badge=0&autopause=0&player_id=0'
 
     return (
-      <div className="item" id={this.props.obj.id} ref={this.props.id}>
-        <LazyLoad height={this.props.height}>
-          <iframe 
-            src={url} 
+      <div className="item">
+        <LazyLoad 
+          childRef={this.props.obj.id}
+          debug={this.props.obj.title}
+          height={this.props.height}
+          focusing={this.focusing}
+          notFocusing={this.notFocusing}>
+          <iframe
+            ref={this.props.obj.id}
+            id={this.props.obj.id}
+            src={url}
             width={this.props.width}
             height={this.props.height}
             frameBorder="0" 
-            webkitallowfullscreen mozallowfullscreen allowfFullScreen></iframe>
+            webkitallowfullscreen mozallowfullscreen allowfFullScreen>
+          </iframe>
         </LazyLoad>
         <Info
           description={this.props.obj.description}

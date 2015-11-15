@@ -1,6 +1,7 @@
 'use strict'
 
 import React from 'react'
+import ReactDom from 'react-dom'
 import Item from './item'
 
 const List = React.createClass({
@@ -13,20 +14,18 @@ const List = React.createClass({
   //   height: React.propTypes.number,
   //   maxHeight: React.propTypes.number
   // },
-  getFocus(){
-
-  },
 
   render(){
 
-    const items = this.props.lists.map((obj) => {
+    const items = this.props.lists.map((obj, index) => {
       return <Item 
         obj={obj}
-        key={obj.id}      
+        ref={obj.id}
+        key={index}      
         width={this.props.width}
         height={this.props.height}
-        maxHeight={this.props.maxHeight}
-        getFocus={this.getFocus}></Item>
+        maxHeight={this.props.maxHeight}>
+      </Item>
     })
 
     return (
@@ -38,4 +37,3 @@ const List = React.createClass({
 })
 
 module.exports = List
-

@@ -21192,6 +21192,10 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _reactDom = __webpack_require__(158);
+
+	var _reactDom2 = _interopRequireDefault(_reactDom);
+
 	var _item = __webpack_require__(166);
 
 	var _item2 = _interopRequireDefault(_item);
@@ -21206,19 +21210,18 @@
 	  //   height: React.propTypes.number,
 	  //   maxHeight: React.propTypes.number
 	  // },
-	  getFocus: function getFocus() {},
 
 	  render: function render() {
 	    var _this = this;
 
-	    var items = this.props.lists.map(function (obj) {
+	    var items = this.props.lists.map(function (obj, index) {
 	      return _react2['default'].createElement(_item2['default'], {
 	        obj: obj,
-	        key: obj.id,
+	        ref: obj.id,
+	        key: index,
 	        width: _this.props.width,
 	        height: _this.props.height,
-	        maxHeight: _this.props.maxHeight,
-	        getFocus: _this.getFocus });
+	        maxHeight: _this.props.maxHeight });
 	    });
 
 	    return _react2['default'].createElement(
@@ -21251,14 +21254,15 @@
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
-	var _reactLazyLoad = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"react-lazy-load\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+	var _lazyLoad = __webpack_require__(168);
 
-	var _reactLazyLoad2 = _interopRequireDefault(_reactLazyLoad);
+	var _lazyLoad2 = _interopRequireDefault(_lazyLoad);
 
 	var _info = __webpack_require__(169);
 
 	var _info2 = _interopRequireDefault(_info);
 
+	console.dir(_lazyLoad2['default']);
 	var Item = _react2['default'].createClass({
 
 	  displayName: 'Item',
@@ -21269,26 +21273,17 @@
 	  //   height: React.propTypes.number,
 	  //   maxHeight: React.propTypes.number
 	  // },
-	  onWindowScroll: function onWindowScroll() {
-	    var n = _reactDom2['default'].findDOMNode(this);
-	    console.dir(n.id);
-	    // const threshold = ReactDom.findDOMNode(this).scrollHeight
-	    // const bounds = ReactDom.findDOMNode(this).getBoundingClientRect()
-	    // console.log(bounds)
-	    // const scrollTop = window.pageYOffset
-	    // const top = bounds.top + scrollTop
-	    // const height = bounds.bottom - bounds.top
 
-	    // if (top === 0 || (top <= (scrollTop + window.innerHeight + threshold)
-	    //                   && (top + height) > (scrollTop - threshold))) {
-	    //   this.setState({ visible: true });
-	    //   this.onVisible();
-	    // }
-	    this.props.getFocus(n.id);
-	  },
-
-	  componentDidMount: function componentDidMount() {
-	    window.addEventListener('scroll', this.onWindowScroll);
+	  msg: function msg() {
+	    var ifr = _reactDom2['default'].findDOMNode(this.refs[this.props.obj.id]);
+	    if (ifr !== null) {
+	      console.dir(ifr);
+	      console.log('stop');
+	      var obj = {
+	        'method': 'pause'
+	      };
+	      ifr.contentWindow.postMessage(JSON.stringify(obj), ifr.src);
+	    }
 	  },
 
 	  render: function render() {
@@ -21297,11 +21292,18 @@
 
 	    return _react2['default'].createElement(
 	      'div',
-	      { className: 'item', id: this.props.obj.id, ref: this.props.id },
+	      { className: 'item' },
 	      _react2['default'].createElement(
-	        _reactLazyLoad2['default'],
-	        { height: this.props.height },
+	        _lazyLoad2['default'],
+	        {
+	          childRef: this.props.obj.id,
+	          debug: this.props.obj.title,
+	          height: this.props.height,
+	          focusing: this.focusing,
+	          notFocusing: this.notFocusing },
 	        _react2['default'].createElement('iframe', {
+	          ref: this.props.obj.id,
+	          id: this.props.obj.id,
 	          src: url,
 	          width: this.props.width,
 	          height: this.props.height,
@@ -21378,7 +21380,106 @@
 	})();
 
 /***/ },
-/* 168 */,
+/* 168 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactDom = __webpack_require__(158);
+
+	var _classnames = __webpack_require__(167);
+
+	var _classnames2 = _interopRequireDefault(_classnames);
+
+	var LazyLoad = _react2['default'].createClass({
+
+	  displayName: 'lazyLoad',
+
+	  propTypes: {
+	    children: _react2['default'].PropTypes.node.isRequired,
+	    height: _react2['default'].PropTypes.oneOfType([_react2['default'].PropTypes.string, _react2['default'].PropTypes.number]),
+	    threshold: _react2['default'].PropTypes.number
+	  },
+
+	  getDefaultProps: function getDefaultProps() {
+	    return {
+	      threshold: 0
+	    };
+	  },
+
+	  getInitialState: function getInitialState() {
+	    return {
+	      visible: false
+	    };
+	  },
+
+	  componentDidMount: function componentDidMount() {
+	    window.addEventListener('scroll', this.onWindowScroll);
+	    window.addEventListener('resize', this.onWindowScroll);
+	    this.onWindowScroll();
+	  },
+
+	  componentDidUpdate: function componentDidUpdate() {
+	    if (!this.state.visible) this.onWindowScroll();
+	  },
+
+	  componentWillUnmount: function componentWillUnmount() {
+	    this.onVisible();
+	  },
+
+	  onInvisible: function onInvisible() {
+	    //console.dir(this.props.children)
+	    //console.log(findDOMNode(this.refs[this.props.childRef]))
+	    var ifr = document.getElementById(this.props.childRef + '');
+	    if (ifr !== null) {
+	      var obj = {
+	        'method': 'pause'
+	      };
+	      ifr.contentWindow.postMessage(JSON.stringify(obj), ifr.src);
+	    }
+	  },
+
+	  onWindowScroll: function onWindowScroll() {
+	    var threshold = this.props.threshold;
+
+	    var bounds = (0, _reactDom.findDOMNode)(this).getBoundingClientRect();
+	    var scrollTop = window.pageYOffset;
+	    var top = bounds.top + scrollTop;
+	    var height = bounds.bottom - bounds.top;
+
+	    if (top === 0 || top <= scrollTop + window.innerHeight + threshold && top + height > scrollTop - threshold) {
+	      this.setState({ visible: true });
+	    } else {
+	      this.onInvisible();
+	    }
+	  },
+
+	  render: function render() {
+	    var elStyles = {
+	      height: this.props.height
+	    };
+	    var elClasses = (0, _classnames2['default'])({
+	      'lazy-load': true,
+	      'lazy-load-visible': this.state.visible
+	    });
+
+	    return _react2['default'].createElement(
+	      'div',
+	      { className: elClasses, style: elStyles },
+	      this.state.visible && this.props.children
+	    );
+	  }
+	});
+
+	module.exports = LazyLoad;
+
+/***/ },
 /* 169 */
 /***/ function(module, exports, __webpack_require__) {
 
