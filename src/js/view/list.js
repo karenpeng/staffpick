@@ -1,39 +1,38 @@
 'use strict'
 
 import React from 'react'
-import r from 'r-dom'
-import MyVideo from './video'
+import Item from './item'
 
-const MyList = React.createClass({
+const List = React.createClass({
 
   displayName: 'List',
 
   // propTypes:{
-  //   ids: React.propTypes.array
+  //   lists: React.propTypes.array,
+  //   width: React.propTypes.number,
+  //   height: React.propTypes.number,
+  //   maxHeight: React.propTypes.number
   // },
 
   render(){
 
-    const videos = this.props.info.map((obj) => {
-      return <MyVideo 
-        id={obj.id} 
-        key={obj.id}
-        title={obj.title}
-        user_url={obj.user_url}
-        user_name={obj.user_name}
-        description={obj.description}
+    const items = this.props.lists.map((obj) => {
+      return <Item 
+        obj={obj}
+        key={obj.id}      
         width={this.props.width}
         height={this.props.height}
-      ></MyVideo>
+        maxHeight={this.props.maxHeight}
+      ></Item>
     })
 
     return (
       <div>
-      {videos}
+      {items}
       </div>
     )
   }
 })
 
-module.exports = MyList
+module.exports = List
 

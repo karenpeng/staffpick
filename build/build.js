@@ -56,36 +56,27 @@
 
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 
-	var _rDom = __webpack_require__(164);
-
-	var _rDom2 = _interopRequireDefault(_rDom);
-
 	var _requestRequest = __webpack_require__(159);
 
 	var _requestRequest2 = _interopRequireDefault(_requestRequest);
+
+	var _modelModel = __webpack_require__(171);
 
 	var _viewApp = __webpack_require__(169);
 
 	var _viewApp2 = _interopRequireDefault(_viewApp);
 
-	function render(info) {
-	  _reactDom2['default'].render((0, _rDom2['default'])(_viewApp2['default'], {
-	    info: info
-	  }), document.getElementById('container'));
+	function render(list) {
+	  _reactDom2['default'].render(_react2['default'].createElement(_viewApp2['default'], { list: list }), document.getElementById('container'));
 	}
 
 	function cb(body) {
-	  var info = [];
+	  var list = new _modelModel.ListModel();
 	  body.forEach(function (v) {
-	    info.push({
-	      id: v.id,
-	      title: v.title,
-	      user_url: v.user_url,
-	      user_name: v.user_name,
-	      description: v.description
-	    });
+	    var item = new _modelModel.ItemModel(v);
+	    list.addItem(item);
 	  });
-	  render(info);
+	  render(list);
 	}
 
 	(0, _requestRequest2['default'])(cb);
@@ -21073,302 +21064,48 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _rDom = __webpack_require__(164);
+	var _item = __webpack_require__(172);
 
-	var _rDom2 = _interopRequireDefault(_rDom);
+	var _item2 = _interopRequireDefault(_item);
 
-	var _video = __webpack_require__(166);
-
-	var _video2 = _interopRequireDefault(_video);
-
-	var MyList = _react2['default'].createClass({
+	var List = _react2['default'].createClass({
 
 	  displayName: 'List',
 
 	  // propTypes:{
-	  //   ids: React.propTypes.array
+	  //   lists: React.propTypes.array,
+	  //   width: React.propTypes.number,
+	  //   height: React.propTypes.number,
+	  //   maxHeight: React.propTypes.number
 	  // },
 
 	  render: function render() {
 	    var _this = this;
 
-	    var videos = this.props.info.map(function (obj) {
-	      return _react2['default'].createElement(_video2['default'], {
-	        id: obj.id,
+	    var items = this.props.lists.map(function (obj) {
+	      return _react2['default'].createElement(_item2['default'], {
+	        obj: obj,
 	        key: obj.id,
-	        title: obj.title,
-	        user_url: obj.user_url,
-	        user_name: obj.user_name,
-	        description: obj.description,
 	        width: _this.props.width,
-	        height: _this.props.height
+	        height: _this.props.height,
+	        maxHeight: _this.props.maxHeight
 	      });
 	    });
 
 	    return _react2['default'].createElement(
 	      'div',
 	      null,
-	      videos
+	      items
 	    );
 	  }
 	});
 
-	module.exports = MyList;
+	module.exports = List;
 
 /***/ },
-/* 164 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	var React = __webpack_require__(1);
-	var classSet = __webpack_require__(165);
-
-	var childTypes = ['string', 'number'];
-
-	module.exports = r;
-
-	// Export the React.DOM html tags
-	for (var domTag in React.DOM) {
-	  if (React.DOM.hasOwnProperty(domTag)) {
-	    r[domTag] = createTagFn(domTag);
-	  }
-	}
-
-	function r(component, properties, children) {
-	  properties = properties || {};
-
-	  // A properties object is optional so shift arguments if missing
-	  if (!children && isChildren(properties)) {
-	    children = properties;
-	    properties = {};
-	  }
-
-	  if (properties.isRendered !== undefined && !properties.isRendered) {
-	    // React skips the component rendering if render() returns null.
-	    return null;
-	  }
-
-	  processClasses(properties);
-
-	  // Don't use an array if there's only one child
-	  if (Array.isArray(children) && children.length === 1) {
-	    children = children[0];
-	  }
-
-	  // When there's only one child, call createElement normally
-	  // to achieve a minor performance gain
-	  if (!Array.isArray(children)) {
-	    return React.createElement(component, properties, children);
-	  }
-
-	  // When many children, use apply to prevent unnecessary key warnings
-	  var args = createArguments(component, properties, children);
-	  return React.createElement.apply(React, args);
-	}
-
-	// Wraps the classSet property value with React.addons.classSet
-	// and merge into className.
-	function processClasses(properties) {
-	  var classSetConfig = properties.classSet;
-	  if (!classSetConfig) {
-	    return;
-	  }
-
-	  var className = properties.className;
-	  if (className && typeof className === 'string') {
-	    var names = className.match(/\S+/g);
-	    if (!names) {
-	      return;
-	    }
-
-	    for (var i = 0; i < names.length; i++) {
-	      classSetConfig[names[i]] = true;
-	    }
-	  }
-
-	  properties.className = classSet(classSetConfig);
-	}
-
-	// Creates an array of React.createElement arguments in a performant way
-	function createArguments(component, properties, children) {
-	  var argLength = children.length + 2;
-	  var args = new Array(argLength);
-
-	  args[0] = component;
-	  args[1] = properties;
-	  for (var i = 0; i < children.length; i++) {
-	    var argsIndex = i + 2;
-	    args[argsIndex] = children[i];
-	  }
-
-	  return args;
-	}
-
-	function createTagFn(tagName) {
-	  return function reactTag(properties, children) {
-	    return r(tagName, properties, children);
-	  };
-	}
-
-	function isChildren(x) {
-	  return childTypes.indexOf(typeof x) !== -1 || Array.isArray(x);
-	}
-
-/***/ },
-/* 165 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
-	  Copyright (c) 2015 Jed Watson.
-	  Licensed under the MIT License (MIT), see
-	  http://jedwatson.github.io/classnames
-	*/
-
-	'use strict';
-
-	function classNames() {
-		var classes = '';
-		var arg;
-
-		for (var i = 0; i < arguments.length; i++) {
-			arg = arguments[i];
-			if (!arg) {
-				continue;
-			}
-
-			if ('string' === typeof arg || 'number' === typeof arg) {
-				classes += ' ' + arg;
-			} else if (Object.prototype.toString.call(arg) === '[object Array]') {
-				classes += ' ' + classNames.apply(null, arg);
-			} else if ('object' === typeof arg) {
-				for (var key in arg) {
-					if (!arg.hasOwnProperty(key) || !arg[key]) {
-						continue;
-					}
-					classes += ' ' + key;
-				}
-			}
-		}
-		return classes.substr(1);
-	}
-
-	// safely export classNames for node / browserify
-	if (typeof module !== 'undefined' && module.exports) {
-		module.exports = classNames;
-	}
-
-	// safely export classNames for RequireJS
-	if (true) {
-		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
-			return classNames;
-		}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}
-
-/***/ },
-/* 166 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _reactDom = __webpack_require__(158);
-
-	var _reactDom2 = _interopRequireDefault(_reactDom);
-
-	var _rDom = __webpack_require__(164);
-
-	var _rDom2 = _interopRequireDefault(_rDom);
-
-	var _classnames = __webpack_require__(168);
-
-	var _classnames2 = _interopRequireDefault(_classnames);
-
-	var _reactLazyLoad = __webpack_require__(167);
-
-	var _reactLazyLoad2 = _interopRequireDefault(_reactLazyLoad);
-
-	var MyVideo = _react2['default'].createClass({
-
-	  displayName: 'Video',
-
-	  // propTypes:{
-	  //   id: React.propTypes.number
-	  // },
-	  getInitialState: function getInitialState() {
-	    return {
-	      overFlowHidden: false
-	    };
-	  },
-
-	  componentDidMount: function componentDidMount() {
-	    var scrollHeight = _reactDom2['default'].findDOMNode(this.refs[this.props.id]).scrollHeight;
-	    if (scrollHeight > 200) {
-	      this.setState({
-	        overFlowHidden: true
-	      });
-	    }
-	  },
-
-	  learnMore: function learnMore() {
-	    this.setState({
-	      overFlowHidden: false
-	    });
-	  },
-
-	  render: function render() {
-	    var url = "https://player.vimeo.com/video/" + this.props.id;
-	    //+ '?badge=0&autopause=0&player_id=0'
-	    var overLayStyle = {
-	      display: this.state.overFlowHidden ? 'block' : 'none',
-	      width: this.props.width
-	    };
-
-	    return _react2['default'].createElement(
-	      'div',
-	      { className: 'item' },
-	      _react2['default'].createElement(
-	        _reactLazyLoad2['default'],
-	        { height: this.props.height },
-	        _react2['default'].createElement('iframe', {
-	          src: url,
-	          width: this.props.width,
-	          height: this.props.height,
-	          frameBorder: '0',
-	          webkitallowfullscreen: true, mozallowfullscreen: true, allowfFullScreen: true })
-	      ),
-	      _react2['default'].createElement(
-	        'div',
-	        { className: 'wrap' },
-	        _react2['default'].createElement('div', {
-	          ref: this.props.id,
-	          className: (0, _classnames2['default'])("info", { "info_hide": this.state.overFlowHidden }),
-	          dangerouslySetInnerHTML: { __html: this.props.description } }),
-	        _react2['default'].createElement(
-	          'div',
-	          {
-	            className: 'overlay',
-	            style: overLayStyle },
-	          _react2['default'].createElement(
-	            'span',
-	            {
-	              className: 'learnMore',
-	              onClick: this.learnMore },
-	            'Read More...'
-	          )
-	        )
-	      )
-	    );
-	  }
-	});
-
-	module.exports = MyVideo;
-
-/***/ },
+/* 164 */,
+/* 165 */,
+/* 166 */,
 /* 167 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -21582,10 +21319,6 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _rDom = __webpack_require__(164);
-
-	var _rDom2 = _interopRequireDefault(_rDom);
-
 	var _list = __webpack_require__(163);
 
 	var _list2 = _interopRequireDefault(_list);
@@ -21595,24 +21328,305 @@
 	  displayName: 'App',
 
 	  // propTypes:{
-	  //   id: React.propTypes.number
+	  //   list: React.propTypes.object
 	  // },
 
-	  render: function render() {
+	  getInitialState: function getInitialState() {
+	    return {
+	      list: this.props.list
+	    };
+	  },
 
+	  handleSort: function handleSort(val) {
+	    list.sortBy(val);
+	  },
+
+	  render: function render() {
+	    console.log(this.state.list);
 	    return _react2['default'].createElement(
 	      'div',
 	      null,
 	      _react2['default'].createElement('img', { src: 'https://i.vimeocdn.com/channel/289181_980?mh=250', alt: 'Vimeo Staff Picks' }),
+	      _react2['default'].createElement('div', { className: 'filter' }),
 	      _react2['default'].createElement(_list2['default'], {
-	        info: this.props.info,
+	        lists: this.state.list.items,
 	        width: 960,
-	        height: 540 })
+	        height: 540,
+	        maxHeight: 220 })
 	    );
 	  }
 	});
 
 	module.exports = App;
+
+/***/ },
+/* 170 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactDom = __webpack_require__(158);
+
+	var _reactDom2 = _interopRequireDefault(_reactDom);
+
+	var _classnames = __webpack_require__(168);
+
+	var _classnames2 = _interopRequireDefault(_classnames);
+
+	var _commaNumber = __webpack_require__(173);
+
+	var _commaNumber2 = _interopRequireDefault(_commaNumber);
+
+	var Info = _react2['default'].createClass({
+
+	  displayName: 'Info',
+
+	  // propTypes:{
+	  //   id: React.propTypes.number,
+	  //   description: React.propTypes.string,
+	  //   likes: React.propTypes.number,
+	  //   plays: React.propTypes.number,
+	  //   comments: React.propTypes.number,
+	  //   duration: React.propTypes.number,
+	  //   width: React.propTypes.number,
+	  //   maxHeight: React.propTypes.number
+	  // },
+
+	  getInitialState: function getInitialState() {
+	    return {
+	      overFlowHidden: false
+	    };
+	  },
+
+	  componentDidMount: function componentDidMount() {
+	    var scrollHeight = _reactDom2['default'].findDOMNode(this.refs[this.props.id]).scrollHeight;
+	    if (scrollHeight > this.props.maxHeight) {
+	      this.setState({
+	        overFlowHidden: true
+	      });
+	    }
+	  },
+
+	  learnMore: function learnMore() {
+	    this.setState({
+	      overFlowHidden: false
+	    });
+	  },
+
+	  render: function render() {
+	    var overLayStyle = {
+	      display: this.state.overFlowHidden ? 'block' : 'none',
+	      width: this.props.width
+	    };
+
+	    return _react2['default'].createElement(
+	      'div',
+	      { className: 'wrap' },
+	      _react2['default'].createElement('div', {
+	        ref: this.props.id,
+	        className: (0, _classnames2['default'])("info", { "info_hide": this.state.overFlowHidden }),
+	        dangerouslySetInnerHTML: { __html: this.props.description } }),
+	      _react2['default'].createElement(
+	        'div',
+	        {
+	          className: 'overlay',
+	          style: overLayStyle },
+	        _react2['default'].createElement(
+	          'strong',
+	          {
+	            className: 'learnMore',
+	            onClick: this.learnMore },
+	          'Read More...'
+	        )
+	      ),
+	      _react2['default'].createElement(
+	        'div',
+	        { className: 'subinfo' },
+	        _react2['default'].createElement(
+	          'strong',
+	          { className: 'plays' },
+	          (0, _commaNumber2['default'])(this.props.plays),
+	          ' plays'
+	        ),
+	        ' ',
+	        _react2['default'].createElement(
+	          'strong',
+	          { className: 'likes' },
+	          (0, _commaNumber2['default'])(this.props.likes),
+	          ' likes'
+	        ),
+	        ' ',
+	        _react2['default'].createElement(
+	          'strong',
+	          { className: 'comments' },
+	          (0, _commaNumber2['default'])(this.props.comments),
+	          ' comments'
+	        )
+	      )
+	    );
+	  }
+	});
+
+	module.exports = Info;
+
+/***/ },
+/* 171 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	function ListModel() {
+	  this.items = [];
+	}
+
+	ListModel.prototype.addItem = function (item) {
+	  this.items.push(item);
+	};
+
+	ListModel.prototype.sortBy = function (value) {
+	  this.items.sort(function (a, b) {
+	    return a.value - b.value;
+	  });
+	};
+
+	function ItemModel(obj) {
+	  this.id = obj.id;
+	  this.title = obj.title;
+	  this.description = obj.description;
+	  this.user_name = obj.user_name;
+	  this.user_url = obj.user_url;
+	  this.likes = obj.stats_number_of_likes;
+	  this.plays = obj.stats_number_of_plays;
+	  this.comments = obj.stats_number_of_comments;
+	  this.duration = obj.duration;
+	}
+
+	module.exports = {
+	  ListModel: ListModel,
+	  ItemModel: ItemModel
+	};
+
+/***/ },
+/* 172 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _classnames = __webpack_require__(168);
+
+	var _classnames2 = _interopRequireDefault(_classnames);
+
+	var _reactLazyLoad = __webpack_require__(167);
+
+	var _reactLazyLoad2 = _interopRequireDefault(_reactLazyLoad);
+
+	var _info = __webpack_require__(170);
+
+	var _info2 = _interopRequireDefault(_info);
+
+	var Item = _react2['default'].createClass({
+
+	  displayName: 'Item',
+
+	  // propTypes:{
+	  //   obj: React.propTypes.object,
+	  //   width: React.propTypes.number,
+	  //   height: React.propTypes.number,
+	  //   maxHeight: React.propTypes.number
+	  // },
+
+	  render: function render() {
+	    var url = "https://player.vimeo.com/video/" + this.props.obj.id;
+	    //+ '?badge=0&autopause=0&player_id=0'
+
+	    return _react2['default'].createElement(
+	      'div',
+	      { className: 'item' },
+	      _react2['default'].createElement(
+	        _reactLazyLoad2['default'],
+	        { height: this.props.height },
+	        _react2['default'].createElement('iframe', {
+	          src: url,
+	          width: this.props.width,
+	          height: this.props.height,
+	          frameBorder: '0',
+	          webkitallowfullscreen: true, mozallowfullscreen: true, allowfFullScreen: true })
+	      ),
+	      _react2['default'].createElement(_info2['default'], {
+	        id: this.props.obj.id,
+	        ref: this.props.obj.id,
+	        description: this.props.obj.description,
+	        likes: this.props.obj.likes,
+	        plays: this.props.obj.plays,
+	        comments: this.props.obj.comments,
+	        duration: this.props.obj.duration,
+	        width: this.props.width,
+	        maxHeight: this.props.maxHeight })
+	    );
+	  }
+	});
+
+	module.exports = Item;
+
+/***/ },
+/* 173 */
+/***/ function(module, exports) {
+
+	/**
+	 * Comma number formatter
+	 * @param {Number} number Number to format
+	 * @param {String} [separator=','] Value used to separate numbers
+	 * @returns {String} Comma formatted number
+	 */
+	'use strict';
+
+	module.exports = function commaNumber(number, separator) {
+	  separator = typeof separator === 'undefined' ? ',' : '' + separator;
+
+	  // Convert to number if it's a non-numeric value
+	  if (typeof number !== 'number') {
+	    number = Number(number);
+	  }
+
+	  // NaN => 0
+	  if (isNaN(number)) {
+	    number = 0;
+	  }
+
+	  // Return Infinity immediately
+	  if (!isFinite(number)) {
+	    return '' + number;
+	  }
+
+	  var stringNumber = ('' + Math.abs(number)).split('').reverse();
+
+	  var result = [];
+	  for (var i = 0; i < stringNumber.length; i++) {
+	    if (i && i % 3 === 0) {
+	      result.push(separator);
+	    }
+	    result.push(stringNumber[i]);
+	  }
+
+	  // Handle negative numbers
+	  if (number < 0) {
+	    result.push('-');
+	  }
+
+	  return result.reverse().join('');
+	};
 
 /***/ }
 /******/ ]);

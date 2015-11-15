@@ -2,29 +2,22 @@
 
 import React from 'react'
 import ReactDom from 'react-dom'
-import r from 'r-dom'
 
 import MakeRequest from './request/request'
+import {ListModel, ItemModel} from './model/model'
 import App from './view/app'
 
-function render(info){
-  ReactDom.render(r(App, {
-      info: info
-    }), document.getElementById('container'))
+function render(list){
+  ReactDom.render(<App list={list}/>, document.getElementById('container'))
 }
 
 function cb(body){
-  let info = []
+  let list = new ListModel()
   body.forEach(function(v){
-    info.push({
-      id: v.id,
-      title: v.title,
-      user_url: v.user_url,
-      user_name: v.user_name,
-      description: v.description
-    })
+    var item = new ItemModel(v)
+    list.addItem(item)
   })
-  render(info)
+  render(list)
 }
 
 MakeRequest(cb)
