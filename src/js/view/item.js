@@ -16,22 +16,32 @@ const Item = React.createClass({
   //   height: React.propTypes.number,
   //   maxHeight: React.propTypes.number
   // },
-  onWindowScroll(){
-    const n = ReactDom.findDOMNode(this)
-    console.dir(n.id)
-    // const threshold = ReactDom.findDOMNode(this).scrollHeight
-    // const bounds = ReactDom.findDOMNode(this).getBoundingClientRect()
-    // console.log(bounds)
-    // const scrollTop = window.pageYOffset
-    // const top = bounds.top + scrollTop
-    // const height = bounds.bottom - bounds.top
+  getInitialState(){
+    return({
+      focus: false
+    }) 
+  },
 
-    // if (top === 0 || (top <= (scrollTop + window.innerHeight + threshold)
-    //                   && (top + height) > (scrollTop - threshold))) {
-    //   this.setState({ visible: true });
-    //   this.onVisible();
-    // }
-    this.props.getFocus(n.id)
+  onWindowScroll(){
+    const node = ReactDom.findDOMNode(this)
+    const threshold = node.scrollHeight
+    const bounds = ReactDom.findDOMNode(this).getBoundingClientRect()
+    const scrollTop = window.pageYOffset
+    const top = bounds.top + scrollTop
+    const height = bounds.bottom - bounds.top
+
+    if (top === 0 || (top <= (scrollTop + window.innerHeight + threshold)
+                      && (top + height) > (scrollTop - threshold))) {
+      this.setState({ focus: true });
+      // const ifr = ReactDom.findDOMNode(this.refs[this.props.id])
+      // var obj = {
+      //   'method': '',
+      //   'value'
+      // }
+      // ifr.contentWindow.postMessage(JSON.stringify(obj), ifr.src)
+      this.props.dim(node.id)
+    }
+    
   },
 
   componentDidMount(){
@@ -43,10 +53,10 @@ const Item = React.createClass({
       //+ '?badge=0&autopause=0&player_id=0'
 
     return (
-      <div className="item" id={this.props.obj.id} ref={this.props.id}>
+      <div className="item" ref={this.props.id} id={this.props.id}>
         <LazyLoad height={this.props.height}>
           <iframe 
-            src={url} 
+            src={url}
             width={this.props.width}
             height={this.props.height}
             frameBorder="0" 

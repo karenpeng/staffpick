@@ -21192,6 +21192,10 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _reactDom = __webpack_require__(158);
+
+	var _reactDom2 = _interopRequireDefault(_reactDom);
+
 	var _item = __webpack_require__(166);
 
 	var _item2 = _interopRequireDefault(_item);
@@ -21206,7 +21210,10 @@
 	  //   height: React.propTypes.number,
 	  //   maxHeight: React.propTypes.number
 	  // },
-	  getFocus: function getFocus() {},
+	  dim: function dim(id) {
+	    var node = _reactDom2['default'].findDOMNode(this.refs.id);
+	    console.log(node);
+	  },
 
 	  render: function render() {
 	    var _this = this;
@@ -21218,7 +21225,7 @@
 	        width: _this.props.width,
 	        height: _this.props.height,
 	        maxHeight: _this.props.maxHeight,
-	        getFocus: _this.getFocus });
+	        dim: _this.dim });
 	    });
 
 	    return _react2['default'].createElement(
@@ -21269,22 +21276,30 @@
 	  //   height: React.propTypes.number,
 	  //   maxHeight: React.propTypes.number
 	  // },
-	  onWindowScroll: function onWindowScroll() {
-	    var n = _reactDom2['default'].findDOMNode(this);
-	    console.dir(n.id);
-	    // const threshold = ReactDom.findDOMNode(this).scrollHeight
-	    // const bounds = ReactDom.findDOMNode(this).getBoundingClientRect()
-	    // console.log(bounds)
-	    // const scrollTop = window.pageYOffset
-	    // const top = bounds.top + scrollTop
-	    // const height = bounds.bottom - bounds.top
+	  getInitialState: function getInitialState() {
+	    return {
+	      focus: false
+	    };
+	  },
 
-	    // if (top === 0 || (top <= (scrollTop + window.innerHeight + threshold)
-	    //                   && (top + height) > (scrollTop - threshold))) {
-	    //   this.setState({ visible: true });
-	    //   this.onVisible();
-	    // }
-	    this.props.getFocus(n.id);
+	  onWindowScroll: function onWindowScroll() {
+	    var node = _reactDom2['default'].findDOMNode(this);
+	    var threshold = node.scrollHeight;
+	    var bounds = _reactDom2['default'].findDOMNode(this).getBoundingClientRect();
+	    var scrollTop = window.pageYOffset;
+	    var top = bounds.top + scrollTop;
+	    var height = bounds.bottom - bounds.top;
+
+	    if (top === 0 || top <= scrollTop + window.innerHeight + threshold && top + height > scrollTop - threshold) {
+	      this.setState({ focus: true });
+	      // const ifr = ReactDom.findDOMNode(this.refs[this.props.id])
+	      // var obj = {
+	      //   'method': '',
+	      //   'value'
+	      // }
+	      // ifr.contentWindow.postMessage(JSON.stringify(obj), ifr.src)
+	      this.props.dim(node.id);
+	    }
 	  },
 
 	  componentDidMount: function componentDidMount() {
@@ -21297,7 +21312,7 @@
 
 	    return _react2['default'].createElement(
 	      'div',
-	      { className: 'item', id: this.props.obj.id, ref: this.props.id },
+	      { className: 'item', ref: this.props.id, id: this.props.id },
 	      _react2['default'].createElement(
 	        _reactLazyLoad2['default'],
 	        { height: this.props.height },

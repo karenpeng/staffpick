@@ -1,6 +1,7 @@
 'use strict'
 
 import React from 'react'
+import ReactDom from 'react-dom'
 import Item from './item'
 
 const List = React.createClass({
@@ -13,8 +14,9 @@ const List = React.createClass({
   //   height: React.propTypes.number,
   //   maxHeight: React.propTypes.number
   // },
-  getFocus(){
-
+  dim(id){
+    const node = ReactDom.findDOMNode(this.refs.id)
+    console.log(node)
   },
 
   render(){
@@ -26,7 +28,7 @@ const List = React.createClass({
         width={this.props.width}
         height={this.props.height}
         maxHeight={this.props.maxHeight}
-        getFocus={this.getFocus}></Item>
+        dim={this.dim}></Item>
     })
 
     return (
