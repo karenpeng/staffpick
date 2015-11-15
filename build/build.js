@@ -60,9 +60,9 @@
 
 	var _requestRequest2 = _interopRequireDefault(_requestRequest);
 
-	var _modelModel = __webpack_require__(171);
+	var _modelModel = __webpack_require__(163);
 
-	var _viewApp = __webpack_require__(169);
+	var _viewApp = __webpack_require__(164);
 
 	var _viewApp2 = _interopRequireDefault(_viewApp);
 
@@ -21054,6 +21054,47 @@
 
 /***/ },
 /* 163 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	function ListModel() {
+	  this.items = [];
+	}
+
+	ListModel.prototype.addItem = function (item) {
+	  this.items.push(item);
+	};
+
+	ListModel.prototype.sortBy = function (value) {
+	  this.items.sort(function (a, b) {
+	    //if(value === 'duration'){
+	    //return +a[value] - +b[value]
+	    //}else{
+	    return +b[value.toLowerCase()] - +a[value.toLowerCase()];
+	    //}
+	  });
+	};
+
+	function ItemModel(obj) {
+	  this.id = obj.id;
+	  this.title = obj.title;
+	  this.description = obj.description;
+	  this.user_name = obj.user_name;
+	  this.user_url = obj.user_url;
+	  this.likes = obj.stats_number_of_likes;
+	  this.plays = obj.stats_number_of_plays;
+	  this.comments = obj.stats_number_of_comments;
+	  this.duration = obj.duration;
+	}
+
+	module.exports = {
+	  ListModel: ListModel,
+	  ItemModel: ItemModel
+	};
+
+/***/ },
+/* 164 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -21064,7 +21105,94 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _item = __webpack_require__(172);
+	var _list = __webpack_require__(165);
+
+	var _list2 = _interopRequireDefault(_list);
+
+	var myList = {};
+
+	var App = _react2['default'].createClass({
+
+	  displayName: 'App',
+
+	  // propTypes:{
+	  //   list: React.propTypes.object
+	  // },
+
+	  getInitialState: function getInitialState() {
+	    return {
+	      list: this.props.list
+	    };
+	  },
+
+	  componentDidMount: function componentDidMount() {
+	    myList = this.props.list;
+	    this.setState({
+	      list: myList
+	    });
+	  },
+
+	  handleSort: function handleSort(event) {
+	    myList.sortBy(event.target.textContent);
+	    this.setState({
+	      list: myList
+	    });
+	  },
+
+	  render: function render() {
+	    return _react2['default'].createElement(
+	      'div',
+	      null,
+	      _react2['default'].createElement('img', { src: 'https://i.vimeocdn.com/channel/289181_980?mh=250', alt: 'Vimeo Staff Picks' }),
+	      _react2['default'].createElement(
+	        'div',
+	        { className: 'filter', onClick: this.handleSort },
+	        'Sort By:   ',
+	        _react2['default'].createElement(
+	          'button',
+	          { id: 'playsBtn' },
+	          'Plays'
+	        ),
+	        _react2['default'].createElement(
+	          'button',
+	          { id: 'likesBtn' },
+	          'Likes'
+	        ),
+	        _react2['default'].createElement(
+	          'button',
+	          { id: 'commentsBtn' },
+	          'Comments'
+	        ),
+	        _react2['default'].createElement(
+	          'button',
+	          { id: 'durationsBtn' },
+	          'Duration'
+	        )
+	      ),
+	      _react2['default'].createElement(_list2['default'], {
+	        lists: this.state.list.items,
+	        width: 960,
+	        height: 540,
+	        maxHeight: 220 })
+	    );
+	  }
+	});
+
+	module.exports = App;
+
+/***/ },
+/* 165 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _item = __webpack_require__(166);
 
 	var _item2 = _interopRequireDefault(_item);
 
@@ -21103,10 +21231,130 @@
 	module.exports = List;
 
 /***/ },
-/* 164 */,
-/* 165 */,
-/* 166 */,
+/* 166 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _classnames = __webpack_require__(167);
+
+	var _classnames2 = _interopRequireDefault(_classnames);
+
+	var _reactLazyLoad = __webpack_require__(168);
+
+	var _reactLazyLoad2 = _interopRequireDefault(_reactLazyLoad);
+
+	var _info = __webpack_require__(169);
+
+	var _info2 = _interopRequireDefault(_info);
+
+	var Item = _react2['default'].createClass({
+
+	  displayName: 'Item',
+
+	  // propTypes:{
+	  //   obj: React.propTypes.object,
+	  //   width: React.propTypes.number,
+	  //   height: React.propTypes.number,
+	  //   maxHeight: React.propTypes.number
+	  // },
+
+	  render: function render() {
+	    var url = "https://player.vimeo.com/video/" + this.props.obj.id;
+	    //+ '?badge=0&autopause=0&player_id=0'
+
+	    return _react2['default'].createElement(
+	      'div',
+	      { className: 'item' },
+	      _react2['default'].createElement(
+	        _reactLazyLoad2['default'],
+	        { height: this.props.height },
+	        _react2['default'].createElement('iframe', {
+	          src: url,
+	          width: this.props.width,
+	          height: this.props.height,
+	          frameBorder: '0',
+	          webkitallowfullscreen: true, mozallowfullscreen: true, allowfFullScreen: true })
+	      ),
+	      _react2['default'].createElement(_info2['default'], {
+	        id: this.props.obj.id,
+	        ref: this.props.obj.id,
+	        description: this.props.obj.description,
+	        likes: this.props.obj.likes,
+	        plays: this.props.obj.plays,
+	        comments: this.props.obj.comments,
+	        duration: this.props.obj.duration,
+	        width: this.props.width,
+	        maxHeight: this.props.maxHeight })
+	    );
+	  }
+	});
+
+	module.exports = Item;
+
+/***/ },
 /* 167 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_RESULT__;/*!
+	  Copyright (c) 2015 Jed Watson.
+	  Licensed under the MIT License (MIT), see
+	  http://jedwatson.github.io/classnames
+	*/
+	/* global define */
+
+	'use strict';
+
+	(function () {
+		'use strict';
+
+		var hasOwn = ({}).hasOwnProperty;
+
+		function classNames() {
+			var classes = '';
+
+			for (var i = 0; i < arguments.length; i++) {
+				var arg = arguments[i];
+				if (!arg) continue;
+
+				var argType = typeof arg;
+
+				if (argType === 'string' || argType === 'number') {
+					classes += ' ' + arg;
+				} else if (Array.isArray(arg)) {
+					classes += ' ' + classNames.apply(null, arg);
+				} else if (argType === 'object') {
+					for (var key in arg) {
+						if (hasOwn.call(arg, key) && arg[key]) {
+							classes += ' ' + key;
+						}
+					}
+				}
+			}
+
+			return classes.substr(1);
+		}
+
+		if (typeof module !== 'undefined' && module.exports) {
+			module.exports = classNames;
+		} else if (true) {
+			// register as 'classnames', consistent with npm package name
+			!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
+				return classNames;
+			}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+		} else {
+			window.classNames = classNames;
+		}
+	})();
+
+/***/ },
+/* 168 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -21167,7 +21415,7 @@
 
 	var _reactDom = __webpack_require__(158);
 
-	var _classnames = __webpack_require__(168);
+	var _classnames = __webpack_require__(167);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -21253,114 +21501,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 168 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_RESULT__;/*!
-	  Copyright (c) 2015 Jed Watson.
-	  Licensed under the MIT License (MIT), see
-	  http://jedwatson.github.io/classnames
-	*/
-	/* global define */
-
-	'use strict';
-
-	(function () {
-		'use strict';
-
-		var hasOwn = ({}).hasOwnProperty;
-
-		function classNames() {
-			var classes = '';
-
-			for (var i = 0; i < arguments.length; i++) {
-				var arg = arguments[i];
-				if (!arg) continue;
-
-				var argType = typeof arg;
-
-				if (argType === 'string' || argType === 'number') {
-					classes += ' ' + arg;
-				} else if (Array.isArray(arg)) {
-					classes += ' ' + classNames.apply(null, arg);
-				} else if (argType === 'object') {
-					for (var key in arg) {
-						if (hasOwn.call(arg, key) && arg[key]) {
-							classes += ' ' + key;
-						}
-					}
-				}
-			}
-
-			return classes.substr(1);
-		}
-
-		if (typeof module !== 'undefined' && module.exports) {
-			module.exports = classNames;
-		} else if (true) {
-			// register as 'classnames', consistent with npm package name
-			!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
-				return classNames;
-			}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-		} else {
-			window.classNames = classNames;
-		}
-	})();
-
-/***/ },
 /* 169 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _list = __webpack_require__(163);
-
-	var _list2 = _interopRequireDefault(_list);
-
-	var App = _react2['default'].createClass({
-
-	  displayName: 'App',
-
-	  // propTypes:{
-	  //   list: React.propTypes.object
-	  // },
-
-	  getInitialState: function getInitialState() {
-	    return {
-	      list: this.props.list
-	    };
-	  },
-
-	  handleSort: function handleSort(val) {
-	    list.sortBy(val);
-	  },
-
-	  render: function render() {
-	    console.log(this.state.list);
-	    return _react2['default'].createElement(
-	      'div',
-	      null,
-	      _react2['default'].createElement('img', { src: 'https://i.vimeocdn.com/channel/289181_980?mh=250', alt: 'Vimeo Staff Picks' }),
-	      _react2['default'].createElement('div', { className: 'filter' }),
-	      _react2['default'].createElement(_list2['default'], {
-	        lists: this.state.list.items,
-	        width: 960,
-	        height: 540,
-	        maxHeight: 220 })
-	    );
-	  }
-	});
-
-	module.exports = App;
-
-/***/ },
-/* 170 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -21375,11 +21516,11 @@
 
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 
-	var _classnames = __webpack_require__(168);
+	var _classnames = __webpack_require__(167);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
-	var _commaNumber = __webpack_require__(173);
+	var _commaNumber = __webpack_require__(170);
 
 	var _commaNumber2 = _interopRequireDefault(_commaNumber);
 
@@ -21476,112 +21617,7 @@
 	module.exports = Info;
 
 /***/ },
-/* 171 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	function ListModel() {
-	  this.items = [];
-	}
-
-	ListModel.prototype.addItem = function (item) {
-	  this.items.push(item);
-	};
-
-	ListModel.prototype.sortBy = function (value) {
-	  this.items.sort(function (a, b) {
-	    return a.value - b.value;
-	  });
-	};
-
-	function ItemModel(obj) {
-	  this.id = obj.id;
-	  this.title = obj.title;
-	  this.description = obj.description;
-	  this.user_name = obj.user_name;
-	  this.user_url = obj.user_url;
-	  this.likes = obj.stats_number_of_likes;
-	  this.plays = obj.stats_number_of_plays;
-	  this.comments = obj.stats_number_of_comments;
-	  this.duration = obj.duration;
-	}
-
-	module.exports = {
-	  ListModel: ListModel,
-	  ItemModel: ItemModel
-	};
-
-/***/ },
-/* 172 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _classnames = __webpack_require__(168);
-
-	var _classnames2 = _interopRequireDefault(_classnames);
-
-	var _reactLazyLoad = __webpack_require__(167);
-
-	var _reactLazyLoad2 = _interopRequireDefault(_reactLazyLoad);
-
-	var _info = __webpack_require__(170);
-
-	var _info2 = _interopRequireDefault(_info);
-
-	var Item = _react2['default'].createClass({
-
-	  displayName: 'Item',
-
-	  // propTypes:{
-	  //   obj: React.propTypes.object,
-	  //   width: React.propTypes.number,
-	  //   height: React.propTypes.number,
-	  //   maxHeight: React.propTypes.number
-	  // },
-
-	  render: function render() {
-	    var url = "https://player.vimeo.com/video/" + this.props.obj.id;
-	    //+ '?badge=0&autopause=0&player_id=0'
-
-	    return _react2['default'].createElement(
-	      'div',
-	      { className: 'item' },
-	      _react2['default'].createElement(
-	        _reactLazyLoad2['default'],
-	        { height: this.props.height },
-	        _react2['default'].createElement('iframe', {
-	          src: url,
-	          width: this.props.width,
-	          height: this.props.height,
-	          frameBorder: '0',
-	          webkitallowfullscreen: true, mozallowfullscreen: true, allowfFullScreen: true })
-	      ),
-	      _react2['default'].createElement(_info2['default'], {
-	        id: this.props.obj.id,
-	        ref: this.props.obj.id,
-	        description: this.props.obj.description,
-	        likes: this.props.obj.likes,
-	        plays: this.props.obj.plays,
-	        comments: this.props.obj.comments,
-	        duration: this.props.obj.duration,
-	        width: this.props.width,
-	        maxHeight: this.props.maxHeight })
-	    );
-	  }
-	});
-
-	module.exports = Item;
-
-/***/ },
-/* 173 */
+/* 170 */
 /***/ function(module, exports) {
 
 	/**

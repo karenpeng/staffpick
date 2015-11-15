@@ -13,6 +13,35 @@ html, body{
   margin: 0 auto;
 }
 
+.filter{
+  width: 480px;
+  margin: 60px auto 0;
+}
+
+.filter button{
+  width: 100px;
+  padding: 8px;
+  border-radius: 6px;
+  border: 0;
+  color: white;
+  font-size: 13px;
+  margin: 0 2px;
+  cursor: pointer;
+  background-color: #777;
+}
+
+#playsBtn{
+  background-color: #6c9;
+}
+
+#likesBtn{
+  background-color: #fc575e;
+}
+
+#commentsBtn{
+  background-color: #4bf;
+}
+
 .item{
   margin: 60px 0;
 }

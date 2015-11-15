@@ -10,7 +10,11 @@ ListModel.prototype.addItem = function(item){
 
 ListModel.prototype.sortBy = function(value){
   this.items.sort(function(a, b){
-    return a.value - b.value
+    //if(value === 'duration'){
+      //return +a[value] - +b[value]
+    //}else{
+      return +b[value.toLowerCase()] - +a[value.toLowerCase()]
+    //}
   })
 }
 

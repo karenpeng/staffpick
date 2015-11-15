@@ -3,6 +3,8 @@
 import React from 'react'
 import List from './list'
 
+let myList = {}
+
 const App = React.createClass({
 
   displayName: 'App',
@@ -17,16 +19,30 @@ const App = React.createClass({
     }
   },
 
-  handleSort(val){
-    list.sortBy(val)
+  componentDidMount(){
+    myList = this.props.list
+    this.setState({
+      list: myList
+    })
+  },
+
+  handleSort(event){
+    myList.sortBy(event.target.textContent)
+    this.setState({
+      list: myList
+    })
   },
 
   render(){
-   console.log(this.state.list)
     return (
       <div>
         <img src="https://i.vimeocdn.com/channel/289181_980?mh=250" alt="Vimeo Staff Picks" />
-        <div className="filter"></div>
+        <div className="filter" onClick={this.handleSort}>
+          Sort By:   <button id="playsBtn">Plays</button>
+          <button id="likesBtn">Likes</button>
+          <button id="commentsBtn">Comments</button>
+          <button id="durationsBtn">Duration</button>
+        </div>
         <List 
           lists={this.state.list.items}
           width={960}
