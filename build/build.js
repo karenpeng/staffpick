@@ -21210,22 +21210,18 @@
 	  //   height: React.propTypes.number,
 	  //   maxHeight: React.propTypes.number
 	  // },
-	  dim: function dim(id) {
-	    var node = _reactDom2['default'].findDOMNode(this.refs.id);
-	    console.log(node);
-	  },
 
 	  render: function render() {
 	    var _this = this;
 
-	    var items = this.props.lists.map(function (obj) {
+	    var items = this.props.lists.map(function (obj, index) {
 	      return _react2['default'].createElement(_item2['default'], {
 	        obj: obj,
-	        key: obj.id,
+	        ref: obj.id,
+	        key: index,
 	        width: _this.props.width,
 	        height: _this.props.height,
-	        maxHeight: _this.props.maxHeight,
-	        dim: _this.dim });
+	        maxHeight: _this.props.maxHeight });
 	    });
 
 	    return _react2['default'].createElement(
@@ -21258,14 +21254,15 @@
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
-	var _reactLazyLoad = __webpack_require__(168);
+	var _lazyLoad = __webpack_require__(173);
 
-	var _reactLazyLoad2 = _interopRequireDefault(_reactLazyLoad);
+	var _lazyLoad2 = _interopRequireDefault(_lazyLoad);
 
 	var _info = __webpack_require__(169);
 
 	var _info2 = _interopRequireDefault(_info);
 
+	console.dir(_lazyLoad2['default']);
 	var Item = _react2['default'].createClass({
 
 	  displayName: 'Item',
@@ -21276,34 +21273,17 @@
 	  //   height: React.propTypes.number,
 	  //   maxHeight: React.propTypes.number
 	  // },
-	  getInitialState: function getInitialState() {
-	    return {
-	      focus: false
-	    };
-	  },
 
-	  onWindowScroll: function onWindowScroll() {
-	    var node = _reactDom2['default'].findDOMNode(this);
-	    var threshold = node.scrollHeight;
-	    var bounds = _reactDom2['default'].findDOMNode(this).getBoundingClientRect();
-	    var scrollTop = window.pageYOffset;
-	    var top = bounds.top + scrollTop;
-	    var height = bounds.bottom - bounds.top;
-
-	    if (top === 0 || top <= scrollTop + window.innerHeight + threshold && top + height > scrollTop - threshold) {
-	      this.setState({ focus: true });
-	      // const ifr = ReactDom.findDOMNode(this.refs[this.props.id])
-	      // var obj = {
-	      //   'method': '',
-	      //   'value'
-	      // }
-	      // ifr.contentWindow.postMessage(JSON.stringify(obj), ifr.src)
-	      this.props.dim(node.id);
+	  msg: function msg() {
+	    var ifr = _reactDom2['default'].findDOMNode(this.refs[this.props.obj.id]);
+	    if (ifr !== null) {
+	      console.dir(ifr);
+	      console.log('stop');
+	      var obj = {
+	        'method': 'pause'
+	      };
+	      ifr.contentWindow.postMessage(JSON.stringify(obj), ifr.src);
 	    }
-	  },
-
-	  componentDidMount: function componentDidMount() {
-	    window.addEventListener('scroll', this.onWindowScroll);
 	  },
 
 	  render: function render() {
@@ -21312,11 +21292,18 @@
 
 	    return _react2['default'].createElement(
 	      'div',
-	      { className: 'item', ref: this.props.id, id: this.props.id },
+	      { className: 'item' },
 	      _react2['default'].createElement(
-	        _reactLazyLoad2['default'],
-	        { height: this.props.height },
+	        _lazyLoad2['default'],
+	        {
+	          childRef: this.props.obj.id,
+	          debug: this.props.obj.title,
+	          height: this.props.height,
+	          focusing: this.focusing,
+	          notFocusing: this.notFocusing },
 	        _react2['default'].createElement('iframe', {
+	          ref: this.props.obj.id,
+	          id: this.props.obj.id,
 	          src: url,
 	          width: this.props.width,
 	          height: this.props.height,
@@ -21393,153 +21380,7 @@
 	})();
 
 /***/ },
-/* 168 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-
-	var _createClass = (function () {
-	  function defineProperties(target, props) {
-	    for (var i = 0; i < props.length; i++) {
-	      var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ('value' in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-	    }
-	  }return function (Constructor, protoProps, staticProps) {
-	    if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-	  };
-	})();
-
-	var _get = function get(_x, _x2, _x3) {
-	  var _again = true;_function: while (_again) {
-	    var object = _x,
-	        property = _x2,
-	        receiver = _x3;desc = parent = getter = undefined;_again = false;if (object === null) object = Function.prototype;var desc = Object.getOwnPropertyDescriptor(object, property);if (desc === undefined) {
-	      var parent = Object.getPrototypeOf(object);if (parent === null) {
-	        return undefined;
-	      } else {
-	        _x = parent;_x2 = property;_x3 = receiver;_again = true;continue _function;
-	      }
-	    } else if ('value' in desc) {
-	      return desc.value;
-	    } else {
-	      var getter = desc.get;if (getter === undefined) {
-	        return undefined;
-	      }return getter.call(receiver);
-	    }
-	  }
-	};
-
-	function _interopRequireDefault(obj) {
-	  return obj && obj.__esModule ? obj : { 'default': obj };
-	}
-
-	function _classCallCheck(instance, Constructor) {
-	  if (!(instance instanceof Constructor)) {
-	    throw new TypeError('Cannot call a class as a function');
-	  }
-	}
-
-	function _inherits(subClass, superClass) {
-	  if (typeof superClass !== 'function' && superClass !== null) {
-	    throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass);
-	  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-	}
-
-	var _react = __webpack_require__(1);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _reactDom = __webpack_require__(158);
-
-	var _classnames = __webpack_require__(167);
-
-	var _classnames2 = _interopRequireDefault(_classnames);
-
-	var LazyLoad = (function (_Component) {
-	  _inherits(LazyLoad, _Component);
-
-	  function LazyLoad(props) {
-	    _classCallCheck(this, LazyLoad);
-
-	    _get(Object.getPrototypeOf(LazyLoad.prototype), 'constructor', this).call(this, props);
-	    this.state = {
-	      visible: false
-	    };
-	    this.onWindowScroll = this.onWindowScroll.bind(this);
-	  }
-
-	  _createClass(LazyLoad, [{
-	    key: 'componentDidMount',
-	    value: function componentDidMount() {
-	      window.addEventListener('scroll', this.onWindowScroll);
-	      window.addEventListener('resize', this.onWindowScroll);
-	      this.onWindowScroll();
-	    }
-	  }, {
-	    key: 'componentDidUpdate',
-	    value: function componentDidUpdate() {
-	      if (!this.state.visible) this.onWindowScroll();
-	    }
-	  }, {
-	    key: 'componentWillUnmount',
-	    value: function componentWillUnmount() {
-	      this.onVisible();
-	    }
-	  }, {
-	    key: 'onVisible',
-	    value: function onVisible() {
-	      window.removeEventListener('scroll', this.onWindowScroll);
-	      window.removeEventListener('resize', this.onWindowScroll);
-	    }
-	  }, {
-	    key: 'onWindowScroll',
-	    value: function onWindowScroll() {
-	      var threshold = this.props.threshold;
-
-	      var bounds = (0, _reactDom.findDOMNode)(this).getBoundingClientRect();
-	      var scrollTop = window.pageYOffset;
-	      var top = bounds.top + scrollTop;
-	      var height = bounds.bottom - bounds.top;
-
-	      if (top === 0 || top <= scrollTop + window.innerHeight + threshold && top + height > scrollTop - threshold) {
-	        this.setState({ visible: true });
-	        this.onVisible();
-	      }
-	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      var elStyles = {
-	        height: this.props.height
-	      };
-	      var elClasses = (0, _classnames2['default'])({
-	        'lazy-load': true,
-	        'lazy-load-visible': this.state.visible
-	      });
-
-	      return _react2['default'].createElement('div', { className: elClasses, style: elStyles }, this.state.visible && this.props.children);
-	    }
-	  }]);
-
-	  return LazyLoad;
-	})(_react.Component);
-
-	exports['default'] = LazyLoad;
-
-	LazyLoad.propTypes = {
-	  children: _react.PropTypes.node.isRequired,
-	  height: _react.PropTypes.oneOfType([_react.PropTypes.string, _react.PropTypes.number]),
-	  threshold: _react.PropTypes.number
-	};
-	LazyLoad.defaultProps = {
-	  threshold: 0
-	};
-	module.exports = exports['default'];
-
-/***/ },
+/* 168 */,
 /* 169 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -21701,6 +21542,108 @@
 
 	  return result.reverse().join('');
 	};
+
+/***/ },
+/* 171 */,
+/* 172 */,
+/* 173 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactDom = __webpack_require__(158);
+
+	var _classnames = __webpack_require__(167);
+
+	var _classnames2 = _interopRequireDefault(_classnames);
+
+	var LazyLoad = _react2['default'].createClass({
+
+	  displayName: 'lazyLoad',
+
+	  propTypes: {
+	    children: _react2['default'].PropTypes.node.isRequired,
+	    height: _react2['default'].PropTypes.oneOfType([_react2['default'].PropTypes.string, _react2['default'].PropTypes.number]),
+	    threshold: _react2['default'].PropTypes.number
+	  },
+
+	  getDefaultProps: function getDefaultProps() {
+	    return {
+	      threshold: 0
+	    };
+	  },
+
+	  getInitialState: function getInitialState() {
+	    return {
+	      visible: false
+	    };
+	  },
+
+	  componentDidMount: function componentDidMount() {
+	    window.addEventListener('scroll', this.onWindowScroll);
+	    window.addEventListener('resize', this.onWindowScroll);
+	    this.onWindowScroll();
+	  },
+
+	  componentDidUpdate: function componentDidUpdate() {
+	    if (!this.state.visible) this.onWindowScroll();
+	  },
+
+	  componentWillUnmount: function componentWillUnmount() {
+	    this.onVisible();
+	  },
+
+	  onInvisible: function onInvisible() {
+	    //console.dir(this.props.children)
+	    //console.log(findDOMNode(this.refs[this.props.childRef]))
+	    var ifr = document.getElementById(this.props.childRef + '');
+	    if (ifr !== null) {
+	      var obj = {
+	        'method': 'pause'
+	      };
+	      ifr.contentWindow.postMessage(JSON.stringify(obj), ifr.src);
+	    }
+	  },
+
+	  onWindowScroll: function onWindowScroll() {
+	    var threshold = this.props.threshold;
+
+	    var bounds = (0, _reactDom.findDOMNode)(this).getBoundingClientRect();
+	    var scrollTop = window.pageYOffset;
+	    var top = bounds.top + scrollTop;
+	    var height = bounds.bottom - bounds.top;
+
+	    if (top === 0 || top <= scrollTop + window.innerHeight + threshold && top + height > scrollTop - threshold) {
+	      this.setState({ visible: true });
+	    } else {
+	      this.onInvisible();
+	    }
+	  },
+
+	  render: function render() {
+	    var elStyles = {
+	      height: this.props.height
+	    };
+	    var elClasses = (0, _classnames2['default'])({
+	      'lazy-load': true,
+	      'lazy-load-visible': this.state.visible
+	    });
+
+	    return _react2['default'].createElement(
+	      'div',
+	      { className: elClasses, style: elStyles },
+	      this.state.visible && this.props.children
+	    );
+	  }
+	});
+
+	module.exports = LazyLoad;
 
 /***/ }
 /******/ ]);

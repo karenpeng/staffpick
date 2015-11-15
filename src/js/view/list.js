@@ -14,21 +14,18 @@ const List = React.createClass({
   //   height: React.propTypes.number,
   //   maxHeight: React.propTypes.number
   // },
-  dim(id){
-    const node = ReactDom.findDOMNode(this.refs.id)
-    console.log(node)
-  },
 
   render(){
 
-    const items = this.props.lists.map((obj) => {
+    const items = this.props.lists.map((obj, index) => {
       return <Item 
         obj={obj}
-        key={obj.id}      
+        ref={obj.id}
+        key={index}      
         width={this.props.width}
         height={this.props.height}
-        maxHeight={this.props.maxHeight}
-        dim={this.dim}></Item>
+        maxHeight={this.props.maxHeight}>
+      </Item>
     })
 
     return (
@@ -40,4 +37,3 @@ const List = React.createClass({
 })
 
 module.exports = List
-
