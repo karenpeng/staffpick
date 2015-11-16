@@ -1,4 +1,5 @@
 import {chai, expect} from 'chai'
+//import expect from 'expect.js'
 import makeRequest from '../src/js/request/request'
 import {ListModel, ItemModel} from './../src/js/model/model'
 import ReactDom from 'react-dom'
@@ -76,8 +77,3 @@ describe('ListModel', function(){
     expect(Object.keys(list.tags).length).to.equal(0)
   })
 })
-
-
-
-
-
