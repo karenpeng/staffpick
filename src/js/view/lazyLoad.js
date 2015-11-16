@@ -2,8 +2,6 @@ import React from 'react'
 import { findDOMNode } from 'react-dom'
 import classNames from 'classnames'
 
-let disappear = false
-
 const LazyLoad = React.createClass({
 
   displayName: 'lazyLoad',
@@ -16,7 +14,7 @@ const LazyLoad = React.createClass({
     ]),
     threshold: React.PropTypes.number,
     childRef: React.PropTypes.number,
-    lightUp: React.PropTypes.func.isRequired,
+    //lightUp: React.PropTypes.func.isRequired,
     msg: React.PropTypes.func.isRequired
   },
 
@@ -43,12 +41,11 @@ const LazyLoad = React.createClass({
   },
 
   componentWillUnmount() {
-    disappear = true
+    window.removeEventListener('scroll', this.onWindowScroll)
+    window.removeEventListener('resize', this.onWindowScroll)
   },
 
   onWindowScroll() {
-    //if(disappear) return
-
     const { threshold } = this.props
 
     const bounds = findDOMNode(this).getBoundingClientRect()
@@ -59,7 +56,7 @@ const LazyLoad = React.createClass({
     if (top === 0 || (top <= (scrollTop + window.innerHeight + threshold)
                       && (top + height) > (scrollTop - threshold))) {
       this.setState({ visible: true })
-      this.props.lightUp()
+      //this.props.lightUp()
     }else{
       this.props.msg(this.props.childRef)
     }

@@ -3,7 +3,7 @@
 function ListModel(){
   this.originalItems = []
   this.items = []
-  this.tags = {'all': true}
+  this.tags = {}
 }
 
 ListModel.prototype.addItem = function(item){
@@ -29,7 +29,10 @@ ListModel.prototype.sortBy = function(value){
 }
 
 ListModel.prototype.filterBy = function(value){
-  if(value === 'all') return
+  if(value === 'all'){
+    this.items = this.originalItems
+    return
+  }
   this.items = this.originalItems.filter( (item) =>{
     return item.tags.some((t) =>{
       return t === value

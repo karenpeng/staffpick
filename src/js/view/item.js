@@ -11,7 +11,15 @@ const Item = React.createClass({
   displayName: 'Item',
 
   propTypes:{
-    obj: React.PropTypes.object.isRequired,
+    obj: React.PropTypes.shape({
+      id: React.PropTypes.number.isRequired,
+      title: React.PropTypes.string.isRequired,
+      description: React.PropTypes.string.isRequired,
+      likes: React.PropTypes.number,
+      plays: React.PropTypes.number,
+      comments: React.PropTypes.number,
+      duration: React.PropTypes.number.isRequired
+    }),
     width: React.PropTypes.number.isRequired,
     height: React.PropTypes.number.isRequired,
     maxHeight: React.PropTypes.number.isRequired,
@@ -31,18 +39,18 @@ const Item = React.createClass({
     })
   },
 
-  getInitialState(){
-    return({
-      fade: false
-    })
-  },
+  // getInitialState(){
+  //   return({
+  //     fade: false
+  //   })
+  // },
 
   msg(pro){
     const ifr = ReactDom.findDOMNode(this.refs[pro])
     if(ifr !== null){
-      this.setState({
-        fade: true
-      })
+      // this.setState({
+      //   fade: true
+      // })
       var obj = {
         'method': 'pause'
       }
@@ -50,11 +58,11 @@ const Item = React.createClass({
     }
   },
 
-  lightUp(){
-    this.setState({
-      fade: false
-    })
-  },
+  // lightUp(){
+  //   this.setState({
+  //     fade: false
+  //   })
+  // },
 
   render(){
     let url = "https://player.vimeo.com/video/" + this.props.obj.id
@@ -66,7 +74,7 @@ const Item = React.createClass({
           childRef={this.props.obj.id}
           debug={this.props.obj.title}
           height={this.props.height}
-          lightUp={this.lightUp}
+          /*lightUp={this.lightUp}*/
           msg={this.msg}>
           <iframe
             ref={this.props.obj.id}

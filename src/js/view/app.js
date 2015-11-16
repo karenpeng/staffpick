@@ -34,8 +34,7 @@ const App = React.createClass({
   },
 
   handleFilter(event){
-    myList.filterBy(event.target.value)
-    console.dir(myList)
+    myList.filterBy(event.target.value.toLowerCase())
     this.setState({
       list: myList
     })
@@ -43,7 +42,10 @@ const App = React.createClass({
 
   render(){
 
-    const options = Object.keys(this.state.list.tags).map((s, index) =>{
+    let tags = Object.keys(this.state.list.tags).sort()
+    tags.unshift('All')
+
+    const options = tags.map((s, index) =>{
       return <option value={s} key={index}>{s}</option>
     })
 
@@ -57,7 +59,7 @@ const App = React.createClass({
             <button id="commentsBtn">Comments</button>
             <button id="durationsBtn">Duration</button>
           </div>
-          <span>Filter By </span>
+          <span>Filter By   </span>
           <select className="filter" onChange={this.handleFilter}>
            {options}
           </select>

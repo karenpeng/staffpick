@@ -21098,7 +21098,7 @@
 	function ListModel() {
 	  this.originalItems = [];
 	  this.items = [];
-	  this.tags = { 'all': true };
+	  this.tags = {};
 	}
 
 	ListModel.prototype.addItem = function (item) {
@@ -21126,7 +21126,10 @@
 	};
 
 	ListModel.prototype.filterBy = function (value) {
-	  if (value === 'all') return;
+	  if (value === 'all') {
+	    this.items = this.originalItems;
+	    return;
+	  }
 	  this.items = this.originalItems.filter(function (item) {
 	    return item.tags.some(function (t) {
 	      return t === value;
@@ -21199,8 +21202,7 @@
 	  },
 
 	  handleFilter: function handleFilter(event) {
-	    myList.filterBy(event.target.value);
-	    console.dir(myList);
+	    myList.filterBy(event.target.value.toLowerCase());
 	    this.setState({
 	      list: myList
 	    });
@@ -21208,7 +21210,10 @@
 
 	  render: function render() {
 
-	    var options = Object.keys(this.state.list.tags).map(function (s, index) {
+	    var tags = Object.keys(this.state.list.tags).sort();
+	    tags.unshift('All');
+
+	    var options = tags.map(function (s, index) {
 	      return _react2['default'].createElement(
 	        'option',
 	        { value: s, key: index },
@@ -21251,7 +21256,7 @@
 	        _react2['default'].createElement(
 	          'span',
 	          null,
-	          'Filter By '
+	          'Filter By   '
 	        ),
 	        _react2['default'].createElement(
 	          'select',
@@ -21357,7 +21362,15 @@
 	  displayName: 'Item',
 
 	  propTypes: {
-	    obj: _react2['default'].PropTypes.object.isRequired,
+	    obj: _react2['default'].PropTypes.shape({
+	      id: _react2['default'].PropTypes.number.isRequired,
+	      title: _react2['default'].PropTypes.string.isRequired,
+	      description: _react2['default'].PropTypes.string.isRequired,
+	      likes: _react2['default'].PropTypes.number,
+	      plays: _react2['default'].PropTypes.number,
+	      comments: _react2['default'].PropTypes.number,
+	      duration: _react2['default'].PropTypes.number.isRequired
+	    }),
 	    width: _react2['default'].PropTypes.number.isRequired,
 	    height: _react2['default'].PropTypes.number.isRequired,
 	    maxHeight: _react2['default'].PropTypes.number.isRequired
@@ -21377,18 +21390,18 @@
 	    };
 	  },
 
-	  getInitialState: function getInitialState() {
-	    return {
-	      fade: false
-	    };
-	  },
+	  // getInitialState(){
+	  //   return({
+	  //     fade: false
+	  //   })
+	  // },
 
 	  msg: function msg(pro) {
 	    var ifr = _reactDom2['default'].findDOMNode(this.refs[pro]);
 	    if (ifr !== null) {
-	      this.setState({
-	        fade: true
-	      });
+	      // this.setState({
+	      //   fade: true
+	      // })
 	      var obj = {
 	        'method': 'pause'
 	      };
@@ -21396,11 +21409,11 @@
 	    }
 	  },
 
-	  lightUp: function lightUp() {
-	    this.setState({
-	      fade: false
-	    });
-	  },
+	  // lightUp(){
+	  //   this.setState({
+	  //     fade: false
+	  //   })
+	  // },
 
 	  render: function render() {
 	    var url = "https://player.vimeo.com/video/" + this.props.obj.id;
@@ -21415,7 +21428,7 @@
 	          childRef: this.props.obj.id,
 	          debug: this.props.obj.title,
 	          height: this.props.height,
-	          lightUp: this.lightUp,
+	          /*lightUp={this.lightUp}*/
 	          msg: this.msg },
 	        _react2['default'].createElement('iframe', {
 	          ref: this.props.obj.id,
@@ -21511,8 +21524,6 @@
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
-	var disappear = false;
-
 	var LazyLoad = _react2['default'].createClass({
 
 	  displayName: 'lazyLoad',
@@ -21522,7 +21533,7 @@
 	    height: _react2['default'].PropTypes.oneOfType([_react2['default'].PropTypes.string, _react2['default'].PropTypes.number]),
 	    threshold: _react2['default'].PropTypes.number,
 	    childRef: _react2['default'].PropTypes.number,
-	    lightUp: _react2['default'].PropTypes.func.isRequired,
+	    //lightUp: React.PropTypes.func.isRequired,
 	    msg: _react2['default'].PropTypes.func.isRequired
 	  },
 
@@ -21549,12 +21560,11 @@
 	  },
 
 	  componentWillUnmount: function componentWillUnmount() {
-	    disappear = true;
+	    window.removeEventListener('scroll', this.onWindowScroll);
+	    window.removeEventListener('resize', this.onWindowScroll);
 	  },
 
 	  onWindowScroll: function onWindowScroll() {
-	    //if(disappear) return
-
 	    var threshold = this.props.threshold;
 
 	    var bounds = (0, _reactDom.findDOMNode)(this).getBoundingClientRect();
@@ -21564,10 +21574,10 @@
 
 	    if (top === 0 || top <= scrollTop + window.innerHeight + threshold && top + height > scrollTop - threshold) {
 	      this.setState({ visible: true });
-	      this.props.lightUp();
+	      //this.props.lightUp()
 	    } else {
-	      this.props.msg(this.props.childRef);
-	    }
+	        this.props.msg(this.props.childRef);
+	      }
 	  },
 
 	  render: function render() {
