@@ -9,16 +9,14 @@ const Info = React.createClass({
 
   displayName: 'Info',
 
-  // propTypes:{
-  //   id: React.propTypes.number,
-  //   description: React.propTypes.string,
-  //   likes: React.propTypes.number,
-  //   plays: React.propTypes.number,
-  //   comments: React.propTypes.number,
-  //   duration: React.propTypes.number,
-  //   width: React.propTypes.number,
-  //   maxHeight: React.propTypes.number
-  // },
+  propTypes:{
+    description: React.PropTypes.string.isRequired,
+    likes: React.PropTypes.number,
+    plays: React.PropTypes.number,
+    comments: React.PropTypes.number,
+    width: React.PropTypes.number.isRequired,
+    maxHeight: React.PropTypes.number.isRequired
+  },
 
   getInitialState(){
     return{
@@ -63,9 +61,7 @@ const Info = React.createClass({
         </div>
         <div className="subinfo">
             <strong className="plays">{commaNumber(this.props.plays)} plays</strong>
-            {' '}
             <strong className="likes">{commaNumber(this.props.likes)} likes</strong>
-            {' '}
             <strong className="comments">{commaNumber(this.props.comments)} comments</strong>
         </div>
       </div>

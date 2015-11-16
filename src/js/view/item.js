@@ -6,23 +6,51 @@ import classNames from 'classnames'
 import LazyLoad from './lazyLoad'
 import Info from './info'
 
-console.dir(LazyLoad)
 const Item = React.createClass({
 
   displayName: 'Item',
 
-  // propTypes:{
-  //   obj: React.propTypes.object,
-  //   width: React.propTypes.number,
-  //   height: React.propTypes.number,
-  //   maxHeight: React.propTypes.number
+  propTypes:{
+    obj: React.PropTypes.shape({
+      id: React.PropTypes.number.isRequired,
+      title: React.PropTypes.string.isRequired,
+      description: React.PropTypes.string.isRequired,
+      likes: React.PropTypes.number,
+      plays: React.PropTypes.number,
+      comments: React.PropTypes.number,
+      duration: React.PropTypes.number.isRequired
+    }),
+    width: React.PropTypes.number.isRequired,
+    height: React.PropTypes.number.isRequired,
+    maxHeight: React.PropTypes.number.isRequired,
+  },
+
+  getDefaultProps(){
+    return({
+      obj: {
+        id: 0,
+        title: '',
+        description: '',
+        likes: 0,
+        plays: 0,
+        comments: 0,
+        duration: 0
+      }
+    })
+  },
+
+  // getInitialState(){
+  //   return({
+  //     fade: false
+  //   })
   // },
 
-  msg(){
-    const ifr = ReactDom.findDOMNode(this.refs[this.props.obj.id])
+  msg(pro){
+    const ifr = ReactDom.findDOMNode(this.refs[pro])
     if(ifr !== null){
-      console.dir(ifr)
-      console.log('stop')
+      // this.setState({
+      //   fade: true
+      // })
       var obj = {
         'method': 'pause'
       }
@@ -30,21 +58,26 @@ const Item = React.createClass({
     }
   },
 
+  // lightUp(){
+  //   this.setState({
+  //     fade: false
+  //   })
+  // },
+
   render(){
     let url = "https://player.vimeo.com/video/" + this.props.obj.id
       //+ '?badge=0&autopause=0&player_id=0'
 
     return (
-      <div className="item">
+      <div className="item" /*style={{opacity: this.state.fade? 0.2 : 1}}*/>
         <LazyLoad 
           childRef={this.props.obj.id}
           debug={this.props.obj.title}
           height={this.props.height}
-          focusing={this.focusing}
-          notFocusing={this.notFocusing}>
+          /*lightUp={this.lightUp}*/
+          msg={this.msg}>
           <iframe
             ref={this.props.obj.id}
-            id={this.props.obj.id}
             src={url}
             width={this.props.width}
             height={this.props.height}
@@ -57,7 +90,6 @@ const Item = React.createClass({
           likes={this.props.obj.likes}
           plays={this.props.obj.plays}
           comments={this.props.obj.comments}
-          duration={this.props.obj.duration} 
           width={this.props.width}
           maxHeight={this.props.maxHeight}></Info>
       </div>

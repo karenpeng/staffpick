@@ -66,20 +66,57 @@
 
 	var _viewApp2 = _interopRequireDefault(_viewApp);
 
-	function render(list) {
-	  _reactDom2['default'].render(_react2['default'].createElement(_viewApp2['default'], { list: list }), document.getElementById('container'));
-	}
+	var _viewLoading = __webpack_require__(171);
 
-	function cb(body) {
-	  var list = new _modelModel.ListModel();
-	  body.forEach(function (v) {
-	    var item = new _modelModel.ItemModel(v);
-	    list.addItem(item);
-	  });
-	  render(list);
-	}
+	var _viewLoading2 = _interopRequireDefault(_viewLoading);
 
-	(0, _requestRequest2['default'])(cb);
+	var myList = new _modelModel.ListModel();
+
+	var Main = _react2['default'].createClass({
+	  displayName: 'Main',
+
+	  getInitialState: function getInitialState() {
+	    return {
+	      list: myList,
+	      loaded: false
+	    };
+	  },
+
+	  makeModel: function makeModel(res) {
+	    if (!res.length) {
+	      alert('ooops something went wrong');
+	      return;
+	    }
+	    res.forEach(function (v) {
+	      var item = new _modelModel.ItemModel(v);
+	      myList.addItem(item);
+	    });
+
+	    //minic network is slow
+	    //setTimeout(function(){
+	    this.setState({
+	      list: myList,
+	      loaded: true
+	    });
+	    // }.bind(this), 4000)
+	  },
+
+	  componentDidMount: function componentDidMount() {
+	    (0, _requestRequest2['default'])(this.makeModel);
+	  },
+
+	  render: function render() {
+
+	    return _react2['default'].createElement(
+	      'div',
+	      null,
+	      _react2['default'].createElement(_viewLoading2['default'], { hide: this.state.loaded }),
+	      _react2['default'].createElement(_viewApp2['default'], { list: this.state.list })
+	    );
+	  }
+	});
+
+	_reactDom2['default'].render(_react2['default'].createElement(Main, null), document.getElementById('container'));
 
 /***/ },
 /* 1 */
@@ -19683,7 +19720,7 @@
 	function makeRequest(cb) {
 	  _superagent2['default'].get('http://vimeo.com/api/v2/channel/staffpicks/videos.json').end(function (err, res) {
 	    if (err) {
-	      console.log(err);
+	      alert(err);
 	      return;
 	    }
 	    cb(res.body);
@@ -21058,12 +21095,35 @@
 
 	'use strict';
 
+	function ItemModel(obj) {
+	  this.id = obj ? obj.id : 0;
+	  this.title = obj ? obj.title : '';
+	  this.description = obj ? obj.description : '';
+	  this.likes = obj ? obj.stats_number_of_likes : 0;
+	  this.plays = obj ? obj.stats_number_of_plays : 0;
+	  this.comments = obj ? obj.stats_number_of_comments : 0;
+	  this.duration = obj ? obj.duration : 0;
+	  this.tags = obj && obj.tags.length ? obj.tags.toLowerCase().split(',') : [];
+	}
+
 	function ListModel() {
+	  this.originalItems = [];
 	  this.items = [];
+	  this.tags = {};
 	}
 
 	ListModel.prototype.addItem = function (item) {
+	  var _this = this;
+
 	  this.items.push(item);
+	  this.originalItems.push(item);
+	  if (item.tags.length) {
+	    item.tags.forEach(function (t) {
+	      if (!_this.tags.hasOwnProperty(t) && t !== '') {
+	        _this.tags[t] = true;
+	      }
+	    });
+	  }
 	};
 
 	ListModel.prototype.sortBy = function (value) {
@@ -21076,21 +21136,21 @@
 	  });
 	};
 
-	function ItemModel(obj) {
-	  this.id = obj.id;
-	  this.title = obj.title;
-	  this.description = obj.description;
-	  this.user_name = obj.user_name;
-	  this.user_url = obj.user_url;
-	  this.likes = obj.stats_number_of_likes;
-	  this.plays = obj.stats_number_of_plays;
-	  this.comments = obj.stats_number_of_comments;
-	  this.duration = obj.duration;
-	}
+	ListModel.prototype.filterBy = function (value) {
+	  if (value === 'all') {
+	    this.items = this.originalItems;
+	    return;
+	  }
+	  this.items = this.originalItems.filter(function (item) {
+	    return item.tags.some(function (t) {
+	      return t === value;
+	    });
+	  });
+	};
 
 	module.exports = {
-	  ListModel: ListModel,
-	  ItemModel: ItemModel
+	  ItemModel: ItemModel,
+	  ListModel: ListModel
 	};
 
 /***/ },
@@ -21115,9 +21175,9 @@
 
 	  displayName: 'App',
 
-	  // propTypes:{
-	  //   list: React.propTypes.object
-	  // },
+	  propTypes: {
+	    list: _react2['default'].PropTypes.object.isRequired
+	  },
 
 	  getInitialState: function getInitialState() {
 	    return {
@@ -21139,34 +21199,67 @@
 	    });
 	  },
 
+	  handleFilter: function handleFilter(event) {
+	    myList.filterBy(event.target.value.toLowerCase());
+	    this.setState({
+	      list: myList
+	    });
+	  },
+
 	  render: function render() {
+
+	    var tags = Object.keys(this.state.list.tags).sort();
+	    tags.unshift('All');
+
+	    var options = tags.map(function (s, index) {
+	      return _react2['default'].createElement(
+	        'option',
+	        { value: s, key: index },
+	        s
+	      );
+	    });
+
 	    return _react2['default'].createElement(
 	      'div',
 	      null,
 	      _react2['default'].createElement('img', { src: 'https://i.vimeocdn.com/channel/289181_980?mh=250', alt: 'Vimeo Staff Picks' }),
 	      _react2['default'].createElement(
 	        'div',
-	        { className: 'filter', onClick: this.handleSort },
-	        'Sort By   ',
+	        { className: 'controlPanel' },
 	        _react2['default'].createElement(
-	          'button',
-	          { id: 'playsBtn' },
-	          'Plays'
+	          'div',
+	          { className: 'sorter', onClick: this.handleSort },
+	          'Sort By   ',
+	          _react2['default'].createElement(
+	            'button',
+	            { id: 'playsBtn' },
+	            'Plays'
+	          ),
+	          _react2['default'].createElement(
+	            'button',
+	            { id: 'likesBtn' },
+	            'Likes'
+	          ),
+	          _react2['default'].createElement(
+	            'button',
+	            { id: 'commentsBtn' },
+	            'Comments'
+	          ),
+	          _react2['default'].createElement(
+	            'button',
+	            { id: 'durationsBtn' },
+	            'Duration'
+	          )
 	        ),
 	        _react2['default'].createElement(
-	          'button',
-	          { id: 'likesBtn' },
-	          'ikes'
+	          'span',
+	          null,
+	          'Filter By   '
 	        ),
 	        _react2['default'].createElement(
-	          'button',
-	          { id: 'commentsBtn' },
-	          'Comments'
-	        ),
-	        _react2['default'].createElement(
-	          'button',
-	          { id: 'durationsBtn' },
-	          'Duration'
+	          'select',
+	          { className: 'filter', onChange: this.handleFilter },
+	          options
 	        )
 	      ),
 	      _react2['default'].createElement(_list2['default'], {
@@ -21204,12 +21297,12 @@
 
 	  displayName: 'List',
 
-	  // propTypes:{
-	  //   lists: React.propTypes.array,
-	  //   width: React.propTypes.number,
-	  //   height: React.propTypes.number,
-	  //   maxHeight: React.propTypes.number
-	  // },
+	  propTypes: {
+	    lists: _react2['default'].PropTypes.array.isRequired,
+	    width: _react2['default'].PropTypes.number.isRequired,
+	    height: _react2['default'].PropTypes.number.isRequired,
+	    maxHeight: _react2['default'].PropTypes.number.isRequired
+	  },
 
 	  render: function render() {
 	    var _this = this;
@@ -21262,23 +21355,51 @@
 
 	var _info2 = _interopRequireDefault(_info);
 
-	console.dir(_lazyLoad2['default']);
 	var Item = _react2['default'].createClass({
 
 	  displayName: 'Item',
 
-	  // propTypes:{
-	  //   obj: React.propTypes.object,
-	  //   width: React.propTypes.number,
-	  //   height: React.propTypes.number,
-	  //   maxHeight: React.propTypes.number
+	  propTypes: {
+	    obj: _react2['default'].PropTypes.shape({
+	      id: _react2['default'].PropTypes.number.isRequired,
+	      title: _react2['default'].PropTypes.string.isRequired,
+	      description: _react2['default'].PropTypes.string.isRequired,
+	      likes: _react2['default'].PropTypes.number,
+	      plays: _react2['default'].PropTypes.number,
+	      comments: _react2['default'].PropTypes.number,
+	      duration: _react2['default'].PropTypes.number.isRequired
+	    }),
+	    width: _react2['default'].PropTypes.number.isRequired,
+	    height: _react2['default'].PropTypes.number.isRequired,
+	    maxHeight: _react2['default'].PropTypes.number.isRequired
+	  },
+
+	  getDefaultProps: function getDefaultProps() {
+	    return {
+	      obj: {
+	        id: 0,
+	        title: '',
+	        description: '',
+	        likes: 0,
+	        plays: 0,
+	        comments: 0,
+	        duration: 0
+	      }
+	    };
+	  },
+
+	  // getInitialState(){
+	  //   return({
+	  //     fade: false
+	  //   })
 	  // },
 
-	  msg: function msg() {
-	    var ifr = _reactDom2['default'].findDOMNode(this.refs[this.props.obj.id]);
+	  msg: function msg(pro) {
+	    var ifr = _reactDom2['default'].findDOMNode(this.refs[pro]);
 	    if (ifr !== null) {
-	      console.dir(ifr);
-	      console.log('stop');
+	      // this.setState({
+	      //   fade: true
+	      // })
 	      var obj = {
 	        'method': 'pause'
 	      };
@@ -21286,24 +21407,29 @@
 	    }
 	  },
 
+	  // lightUp(){
+	  //   this.setState({
+	  //     fade: false
+	  //   })
+	  // },
+
 	  render: function render() {
 	    var url = "https://player.vimeo.com/video/" + this.props.obj.id;
 	    //+ '?badge=0&autopause=0&player_id=0'
 
 	    return _react2['default'].createElement(
 	      'div',
-	      { className: 'item' },
+	      { className: 'item' /*style={{opacity: this.state.fade? 0.2 : 1}}*/ },
 	      _react2['default'].createElement(
 	        _lazyLoad2['default'],
 	        {
 	          childRef: this.props.obj.id,
 	          debug: this.props.obj.title,
 	          height: this.props.height,
-	          focusing: this.focusing,
-	          notFocusing: this.notFocusing },
+	          /*lightUp={this.lightUp}*/
+	          msg: this.msg },
 	        _react2['default'].createElement('iframe', {
 	          ref: this.props.obj.id,
-	          id: this.props.obj.id,
 	          src: url,
 	          width: this.props.width,
 	          height: this.props.height,
@@ -21315,7 +21441,6 @@
 	        likes: this.props.obj.likes,
 	        plays: this.props.obj.plays,
 	        comments: this.props.obj.comments,
-	        duration: this.props.obj.duration,
 	        width: this.props.width,
 	        maxHeight: this.props.maxHeight })
 	    );
@@ -21404,7 +21529,10 @@
 	  propTypes: {
 	    children: _react2['default'].PropTypes.node.isRequired,
 	    height: _react2['default'].PropTypes.oneOfType([_react2['default'].PropTypes.string, _react2['default'].PropTypes.number]),
-	    threshold: _react2['default'].PropTypes.number
+	    threshold: _react2['default'].PropTypes.number,
+	    childRef: _react2['default'].PropTypes.number,
+	    //lightUp: React.PropTypes.func.isRequired,
+	    msg: _react2['default'].PropTypes.func.isRequired
 	  },
 
 	  getDefaultProps: function getDefaultProps() {
@@ -21430,19 +21558,8 @@
 	  },
 
 	  componentWillUnmount: function componentWillUnmount() {
-	    this.onVisible();
-	  },
-
-	  onInvisible: function onInvisible() {
-	    //console.dir(this.props.children)
-	    //console.log(findDOMNode(this.refs[this.props.childRef]))
-	    var ifr = document.getElementById(this.props.childRef + '');
-	    if (ifr !== null) {
-	      var obj = {
-	        'method': 'pause'
-	      };
-	      ifr.contentWindow.postMessage(JSON.stringify(obj), ifr.src);
-	    }
+	    window.removeEventListener('scroll', this.onWindowScroll);
+	    window.removeEventListener('resize', this.onWindowScroll);
 	  },
 
 	  onWindowScroll: function onWindowScroll() {
@@ -21455,9 +21572,10 @@
 
 	    if (top === 0 || top <= scrollTop + window.innerHeight + threshold && top + height > scrollTop - threshold) {
 	      this.setState({ visible: true });
+	      //this.props.lightUp()
 	    } else {
-	      this.onInvisible();
-	    }
+	        this.props.msg(this.props.childRef);
+	      }
 	  },
 
 	  render: function render() {
@@ -21507,16 +21625,14 @@
 
 	  displayName: 'Info',
 
-	  // propTypes:{
-	  //   id: React.propTypes.number,
-	  //   description: React.propTypes.string,
-	  //   likes: React.propTypes.number,
-	  //   plays: React.propTypes.number,
-	  //   comments: React.propTypes.number,
-	  //   duration: React.propTypes.number,
-	  //   width: React.propTypes.number,
-	  //   maxHeight: React.propTypes.number
-	  // },
+	  propTypes: {
+	    description: _react2['default'].PropTypes.string.isRequired,
+	    likes: _react2['default'].PropTypes.number,
+	    plays: _react2['default'].PropTypes.number,
+	    comments: _react2['default'].PropTypes.number,
+	    width: _react2['default'].PropTypes.number.isRequired,
+	    maxHeight: _react2['default'].PropTypes.number.isRequired
+	  },
 
 	  getInitialState: function getInitialState() {
 	    return {
@@ -21573,14 +21689,12 @@
 	          (0, _commaNumber2['default'])(this.props.plays),
 	          ' plays'
 	        ),
-	        ' ',
 	        _react2['default'].createElement(
 	          'strong',
 	          { className: 'likes' },
 	          (0, _commaNumber2['default'])(this.props.likes),
 	          ' likes'
 	        ),
-	        ' ',
 	        _react2['default'].createElement(
 	          'strong',
 	          { className: 'comments' },
@@ -21641,6 +21755,43 @@
 
 	  return result.reverse().join('');
 	};
+
+/***/ },
+/* 171 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var Loading = _react2['default'].createClass({
+
+	  displayName: 'Loading',
+
+	  propTypes: {
+	    hide: _react2['default'].PropTypes.bool.isRequired
+	  },
+
+	  render: function render() {
+	    return _react2['default'].createElement(
+	      'div',
+	      { className: 'load', style: { display: this.props.hide ? 'none' : 'block' } },
+	      _react2['default'].createElement(
+	        'span',
+	        { className: 'loading' },
+	        'Loading'
+	      ),
+	      _react2['default'].createElement('span', { className: 'loading-spinner' })
+	    );
+	  }
+
+	});
+
+	module.exports = Loading;
 
 /***/ }
 /******/ ]);

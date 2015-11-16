@@ -1,11 +1,33 @@
 'use strict'
 
+
+function ItemModel(obj){
+  this.id = obj? obj.id : 0
+  this.title = obj? obj.title : ''
+  this.description = obj? obj.description : ''
+  this.likes = obj? obj.stats_number_of_likes : 0
+  this.plays = obj? obj.stats_number_of_plays : 0
+  this.comments = obj? obj.stats_number_of_comments : 0
+  this.duration = obj? obj.duration : 0
+  this.tags = (obj && obj.tags.length) ? obj.tags.toLowerCase().split(',') : []
+}
+
 function ListModel(){
+  this.originalItems = []
   this.items = []
+  this.tags = {}
 }
 
 ListModel.prototype.addItem = function(item){
   this.items.push(item)
+  this.originalItems.push(item)
+  if(item.tags.length){
+    item.tags.forEach((t) =>{
+      if(!this.tags.hasOwnProperty(t) && t !== ''){
+        this.tags[t] = true
+      }
+    })
+  }
 }
 
 ListModel.prototype.sortBy = function(value){
@@ -18,19 +40,19 @@ ListModel.prototype.sortBy = function(value){
   })
 }
 
-function ItemModel(obj){
-  this.id = obj.id
-  this.title = obj.title
-  this.description = obj.description
-  this.user_name= obj.user_name
-  this.user_url= obj.user_url
-  this.likes = obj.stats_number_of_likes
-  this.plays = obj.stats_number_of_plays
-  this.comments = obj.stats_number_of_comments
-  this.duration = obj.duration
+ListModel.prototype.filterBy = function(value){
+  if(value === 'all'){
+    this.items = this.originalItems
+    return
+  }
+  this.items = this.originalItems.filter( (item) =>{
+    return item.tags.some((t) =>{
+      return t === value
+    })
+  })
 }
 
 module.exports = {
-  ListModel: ListModel,
-  ItemModel: ItemModel
+  ItemModel: ItemModel,
+  ListModel: ListModel
 }

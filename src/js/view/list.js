@@ -8,12 +8,12 @@ const List = React.createClass({
 
   displayName: 'List',
 
-  // propTypes:{
-  //   lists: React.propTypes.array,
-  //   width: React.propTypes.number,
-  //   height: React.propTypes.number,
-  //   maxHeight: React.propTypes.number
-  // },
+  propTypes:{
+    lists: React.PropTypes.array.isRequired,
+    width: React.PropTypes.number.isRequired,
+    height: React.PropTypes.number.isRequired,
+    maxHeight: React.PropTypes.number.isRequired
+  },
 
   render(){
 
