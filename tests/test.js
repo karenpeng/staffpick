@@ -1,9 +1,13 @@
 import {chai, expect} from 'chai'
 //import expect from 'expect.js'
-import makeRequest from '../src/js/request/request'
 import {ListModel, ItemModel} from './../src/js/model/model'
 import ReactDom from 'react-dom'
+import TestUtils from 'react-addons-test-utils'
+const Simulate = TestUtils.Simulate
+
+import makeRequest from '../src/js/request/request'
 import App from './../src/js/view/app'
+import data from './vimeo-1.json'
 
 describe('makeRequest', function(){
     

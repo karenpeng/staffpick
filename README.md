@@ -77,6 +77,7 @@ testing: ~3 hours (encountered many problems with frontend browser testing, also
 
 To fix performance issues<br/>
 To enhance user experience<br/>
+To do more testing<br/>
 To use more apis so that users to browse more resources
 
 -
