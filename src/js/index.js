@@ -36,7 +36,6 @@ const Main = React.createClass({
       loaded: true
     })
      // }.bind(this), 4000)
-  
   },
 
   componentDidMount(){

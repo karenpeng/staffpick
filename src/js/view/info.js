@@ -10,7 +10,7 @@ const Info = React.createClass({
   displayName: 'Info',
 
   propTypes:{
-    description: React.PropTypes.string,
+    description: React.PropTypes.string.isRequired,
     likes: React.PropTypes.number,
     plays: React.PropTypes.number,
     comments: React.PropTypes.number,
