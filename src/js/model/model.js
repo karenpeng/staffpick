@@ -1,11 +1,21 @@
 'use strict'
 
 function ListModel(){
+  this.originalItems = []
   this.items = []
+  this.tags = {'all': true}
 }
 
 ListModel.prototype.addItem = function(item){
   this.items.push(item)
+  this.originalItems.push(item)
+  if(item.tags.length){
+    item.tags.forEach((t) =>{
+      if(!this.tags.hasOwnProperty(t) && t !== ''){
+        this.tags[t] = true
+      }
+    })
+  }
 }
 
 ListModel.prototype.sortBy = function(value){
@@ -15,6 +25,15 @@ ListModel.prototype.sortBy = function(value){
     //}else{
       return +b[value.toLowerCase()] - +a[value.toLowerCase()]
     //}
+  })
+}
+
+ListModel.prototype.filterBy = function(value){
+  if(value === 'all') return
+  this.items = this.originalItems.filter( (item) =>{
+    return item.tags.some((t) =>{
+      return t === value
+    })
   })
 }
 
@@ -28,6 +47,7 @@ function ItemModel(obj){
   this.plays = obj.stats_number_of_plays
   this.comments = obj.stats_number_of_comments
   this.duration = obj.duration
+  this.tags = obj.tags.toLowerCase().split(',')
 }
 
 module.exports = {

@@ -5,7 +5,7 @@ function makeRequest(cb){
   .get('http://vimeo.com/api/v2/channel/staffpicks/videos.json')
   .end(function(err, res){
     if(err){
-      console.log(err)
+      alert(err)
       return
     }
     cb(res.body)
@@ -13,4 +13,6 @@ function makeRequest(cb){
 }
 
 module.exports = makeRequest
+
+
 

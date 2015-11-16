@@ -66,20 +66,57 @@
 
 	var _viewApp2 = _interopRequireDefault(_viewApp);
 
-	function render(list) {
-	  _reactDom2['default'].render(_react2['default'].createElement(_viewApp2['default'], { list: list }), document.getElementById('container'));
-	}
+	var _viewLoading = __webpack_require__(171);
 
-	function cb(body) {
-	  var list = new _modelModel.ListModel();
-	  body.forEach(function (v) {
-	    var item = new _modelModel.ItemModel(v);
-	    list.addItem(item);
-	  });
-	  render(list);
-	}
+	var _viewLoading2 = _interopRequireDefault(_viewLoading);
 
-	(0, _requestRequest2['default'])(cb);
+	var myList = new _modelModel.ListModel();
+
+	var Main = _react2['default'].createClass({
+	  displayName: 'Main',
+
+	  getInitialState: function getInitialState() {
+	    return {
+	      list: myList,
+	      loaded: false
+	    };
+	  },
+
+	  makeModel: function makeModel(res) {
+	    if (!res.length) {
+	      alert('ooops something went wrong');
+	      return;
+	    }
+	    res.forEach(function (v) {
+	      var item = new _modelModel.ItemModel(v);
+	      myList.addItem(item);
+	    });
+
+	    //minic network is slow
+	    //setTimeout(function(){
+	    this.setState({
+	      list: myList,
+	      loaded: true
+	    });
+	    // }.bind(this), 4000)
+	  },
+
+	  componentDidMount: function componentDidMount() {
+	    (0, _requestRequest2['default'])(this.makeModel);
+	  },
+
+	  render: function render() {
+
+	    return _react2['default'].createElement(
+	      'div',
+	      null,
+	      _react2['default'].createElement(_viewLoading2['default'], { hide: this.state.loaded }),
+	      _react2['default'].createElement(_viewApp2['default'], { list: this.state.list })
+	    );
+	  }
+	});
+
+	_reactDom2['default'].render(_react2['default'].createElement(Main, null), document.getElementById('container'));
 
 /***/ },
 /* 1 */
@@ -19683,7 +19720,7 @@
 	function makeRequest(cb) {
 	  _superagent2['default'].get('http://vimeo.com/api/v2/channel/staffpicks/videos.json').end(function (err, res) {
 	    if (err) {
-	      console.log(err);
+	      alert(err);
 	      return;
 	    }
 	    cb(res.body);
@@ -21059,11 +21096,23 @@
 	'use strict';
 
 	function ListModel() {
+	  this.originalItems = [];
 	  this.items = [];
+	  this.tags = { 'all': true };
 	}
 
 	ListModel.prototype.addItem = function (item) {
+	  var _this = this;
+
 	  this.items.push(item);
+	  this.originalItems.push(item);
+	  if (item.tags.length) {
+	    item.tags.forEach(function (t) {
+	      if (!_this.tags.hasOwnProperty(t) && t !== '') {
+	        _this.tags[t] = true;
+	      }
+	    });
+	  }
 	};
 
 	ListModel.prototype.sortBy = function (value) {
@@ -21073,6 +21122,15 @@
 	    //}else{
 	    return +b[value.toLowerCase()] - +a[value.toLowerCase()];
 	    //}
+	  });
+	};
+
+	ListModel.prototype.filterBy = function (value) {
+	  if (value === 'all') return;
+	  this.items = this.originalItems.filter(function (item) {
+	    return item.tags.some(function (t) {
+	      return t === value;
+	    });
 	  });
 	};
 
@@ -21086,6 +21144,7 @@
 	  this.plays = obj.stats_number_of_plays;
 	  this.comments = obj.stats_number_of_comments;
 	  this.duration = obj.duration;
+	  this.tags = obj.tags.toLowerCase().split(',');
 	}
 
 	module.exports = {
@@ -21115,9 +21174,9 @@
 
 	  displayName: 'App',
 
-	  // propTypes:{
-	  //   list: React.propTypes.object
-	  // },
+	  propTypes: {
+	    list: _react2['default'].PropTypes.object.isRequired
+	  },
 
 	  getInitialState: function getInitialState() {
 	    return {
@@ -21139,34 +21198,65 @@
 	    });
 	  },
 
+	  handleFilter: function handleFilter(event) {
+	    myList.filterBy(event.target.value);
+	    console.dir(myList);
+	    this.setState({
+	      list: myList
+	    });
+	  },
+
 	  render: function render() {
+
+	    var options = Object.keys(this.state.list.tags).map(function (s, index) {
+	      return _react2['default'].createElement(
+	        'option',
+	        { value: s, key: index },
+	        s
+	      );
+	    });
+
 	    return _react2['default'].createElement(
 	      'div',
 	      null,
 	      _react2['default'].createElement('img', { src: 'https://i.vimeocdn.com/channel/289181_980?mh=250', alt: 'Vimeo Staff Picks' }),
 	      _react2['default'].createElement(
 	        'div',
-	        { className: 'filter', onClick: this.handleSort },
-	        'Sort By   ',
+	        { className: 'controlPanel' },
 	        _react2['default'].createElement(
-	          'button',
-	          { id: 'playsBtn' },
-	          'Plays'
+	          'div',
+	          { className: 'sorter', onClick: this.handleSort },
+	          'Sort By   ',
+	          _react2['default'].createElement(
+	            'button',
+	            { id: 'playsBtn' },
+	            'Plays'
+	          ),
+	          _react2['default'].createElement(
+	            'button',
+	            { id: 'likesBtn' },
+	            'Likes'
+	          ),
+	          _react2['default'].createElement(
+	            'button',
+	            { id: 'commentsBtn' },
+	            'Comments'
+	          ),
+	          _react2['default'].createElement(
+	            'button',
+	            { id: 'durationsBtn' },
+	            'Duration'
+	          )
 	        ),
 	        _react2['default'].createElement(
-	          'button',
-	          { id: 'likesBtn' },
-	          'ikes'
+	          'span',
+	          null,
+	          'Filter By '
 	        ),
 	        _react2['default'].createElement(
-	          'button',
-	          { id: 'commentsBtn' },
-	          'Comments'
-	        ),
-	        _react2['default'].createElement(
-	          'button',
-	          { id: 'durationsBtn' },
-	          'Duration'
+	          'select',
+	          { className: 'filter', onChange: this.handleFilter },
+	          options
 	        )
 	      ),
 	      _react2['default'].createElement(_list2['default'], {
@@ -21204,12 +21294,12 @@
 
 	  displayName: 'List',
 
-	  // propTypes:{
-	  //   lists: React.propTypes.array,
-	  //   width: React.propTypes.number,
-	  //   height: React.propTypes.number,
-	  //   maxHeight: React.propTypes.number
-	  // },
+	  propTypes: {
+	    lists: _react2['default'].PropTypes.array.isRequired,
+	    width: _react2['default'].PropTypes.number.isRequired,
+	    height: _react2['default'].PropTypes.number.isRequired,
+	    maxHeight: _react2['default'].PropTypes.number.isRequired
+	  },
 
 	  render: function render() {
 	    var _this = this;
@@ -21254,7 +21344,7 @@
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
-	var _lazyLoad = __webpack_require__(173);
+	var _lazyLoad = __webpack_require__(168);
 
 	var _lazyLoad2 = _interopRequireDefault(_lazyLoad);
 
@@ -21262,28 +21352,54 @@
 
 	var _info2 = _interopRequireDefault(_info);
 
-	console.dir(_lazyLoad2['default']);
 	var Item = _react2['default'].createClass({
 
 	  displayName: 'Item',
 
-	  // propTypes:{
-	  //   obj: React.propTypes.object,
-	  //   width: React.propTypes.number,
-	  //   height: React.propTypes.number,
-	  //   maxHeight: React.propTypes.number
-	  // },
+	  propTypes: {
+	    obj: _react2['default'].PropTypes.object.isRequired,
+	    width: _react2['default'].PropTypes.number.isRequired,
+	    height: _react2['default'].PropTypes.number.isRequired,
+	    maxHeight: _react2['default'].PropTypes.number.isRequired
+	  },
 
-	  msg: function msg() {
-	    var ifr = _reactDom2['default'].findDOMNode(this.refs[this.props.obj.id]);
+	  getDefaultProps: function getDefaultProps() {
+	    return {
+	      obj: {
+	        id: 0,
+	        title: '',
+	        description: '',
+	        likes: 0,
+	        plays: 0,
+	        comments: 0,
+	        duration: 0
+	      }
+	    };
+	  },
+
+	  getInitialState: function getInitialState() {
+	    return {
+	      fade: false
+	    };
+	  },
+
+	  msg: function msg(pro) {
+	    var ifr = _reactDom2['default'].findDOMNode(this.refs[pro]);
 	    if (ifr !== null) {
-	      console.dir(ifr);
-	      console.log('stop');
+	      this.setState({
+	        fade: true
+	      });
 	      var obj = {
 	        'method': 'pause'
 	      };
 	      ifr.contentWindow.postMessage(JSON.stringify(obj), ifr.src);
 	    }
+	  },
+
+	  lightUp: function lightUp() {
+	    this.setState({
+	      fade: false
+	    });
 	  },
 
 	  render: function render() {
@@ -21292,18 +21408,17 @@
 
 	    return _react2['default'].createElement(
 	      'div',
-	      { className: 'item' },
+	      { className: 'item' /*style={{opacity: this.state.fade? 0.2 : 1}}*/ },
 	      _react2['default'].createElement(
 	        _lazyLoad2['default'],
 	        {
 	          childRef: this.props.obj.id,
 	          debug: this.props.obj.title,
 	          height: this.props.height,
-	          focusing: this.focusing,
-	          notFocusing: this.notFocusing },
+	          lightUp: this.lightUp,
+	          msg: this.msg },
 	        _react2['default'].createElement('iframe', {
 	          ref: this.props.obj.id,
-	          id: this.props.obj.id,
 	          src: url,
 	          width: this.props.width,
 	          height: this.props.height,
@@ -21315,7 +21430,6 @@
 	        likes: this.props.obj.likes,
 	        plays: this.props.obj.plays,
 	        comments: this.props.obj.comments,
-	        duration: this.props.obj.duration,
 	        width: this.props.width,
 	        maxHeight: this.props.maxHeight })
 	    );
@@ -21380,7 +21494,102 @@
 	})();
 
 /***/ },
-/* 168 */,
+/* 168 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactDom = __webpack_require__(158);
+
+	var _classnames = __webpack_require__(167);
+
+	var _classnames2 = _interopRequireDefault(_classnames);
+
+	var disappear = false;
+
+	var LazyLoad = _react2['default'].createClass({
+
+	  displayName: 'lazyLoad',
+
+	  propTypes: {
+	    children: _react2['default'].PropTypes.node.isRequired,
+	    height: _react2['default'].PropTypes.oneOfType([_react2['default'].PropTypes.string, _react2['default'].PropTypes.number]),
+	    threshold: _react2['default'].PropTypes.number,
+	    childRef: _react2['default'].PropTypes.number,
+	    lightUp: _react2['default'].PropTypes.func.isRequired,
+	    msg: _react2['default'].PropTypes.func.isRequired
+	  },
+
+	  getDefaultProps: function getDefaultProps() {
+	    return {
+	      threshold: 0
+	    };
+	  },
+
+	  getInitialState: function getInitialState() {
+	    return {
+	      visible: false
+	    };
+	  },
+
+	  componentDidMount: function componentDidMount() {
+	    window.addEventListener('scroll', this.onWindowScroll);
+	    window.addEventListener('resize', this.onWindowScroll);
+	    this.onWindowScroll();
+	  },
+
+	  componentDidUpdate: function componentDidUpdate() {
+	    if (!this.state.visible) this.onWindowScroll();
+	  },
+
+	  componentWillUnmount: function componentWillUnmount() {
+	    disappear = true;
+	  },
+
+	  onWindowScroll: function onWindowScroll() {
+	    //if(disappear) return
+
+	    var threshold = this.props.threshold;
+
+	    var bounds = (0, _reactDom.findDOMNode)(this).getBoundingClientRect();
+	    var scrollTop = window.pageYOffset;
+	    var top = bounds.top + scrollTop;
+	    var height = bounds.bottom - bounds.top;
+
+	    if (top === 0 || top <= scrollTop + window.innerHeight + threshold && top + height > scrollTop - threshold) {
+	      this.setState({ visible: true });
+	      this.props.lightUp();
+	    } else {
+	      this.props.msg(this.props.childRef);
+	    }
+	  },
+
+	  render: function render() {
+	    var elStyles = {
+	      height: this.props.height
+	    };
+	    var elClasses = (0, _classnames2['default'])({
+	      'lazy-load': true,
+	      'lazy-load-visible': this.state.visible
+	    });
+
+	    return _react2['default'].createElement(
+	      'div',
+	      { className: elClasses, style: elStyles },
+	      this.state.visible && this.props.children
+	    );
+	  }
+	});
+
+	module.exports = LazyLoad;
+
+/***/ },
 /* 169 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -21408,16 +21617,14 @@
 
 	  displayName: 'Info',
 
-	  // propTypes:{
-	  //   id: React.propTypes.number,
-	  //   description: React.propTypes.string,
-	  //   likes: React.propTypes.number,
-	  //   plays: React.propTypes.number,
-	  //   comments: React.propTypes.number,
-	  //   duration: React.propTypes.number,
-	  //   width: React.propTypes.number,
-	  //   maxHeight: React.propTypes.number
-	  // },
+	  propTypes: {
+	    description: _react2['default'].PropTypes.string,
+	    likes: _react2['default'].PropTypes.number,
+	    plays: _react2['default'].PropTypes.number,
+	    comments: _react2['default'].PropTypes.number,
+	    width: _react2['default'].PropTypes.number.isRequired,
+	    maxHeight: _react2['default'].PropTypes.number.isRequired
+	  },
 
 	  getInitialState: function getInitialState() {
 	    return {
@@ -21474,14 +21681,12 @@
 	          (0, _commaNumber2['default'])(this.props.plays),
 	          ' plays'
 	        ),
-	        ' ',
 	        _react2['default'].createElement(
 	          'strong',
 	          { className: 'likes' },
 	          (0, _commaNumber2['default'])(this.props.likes),
 	          ' likes'
 	        ),
-	        ' ',
 	        _react2['default'].createElement(
 	          'strong',
 	          { className: 'comments' },
@@ -21544,9 +21749,7 @@
 	};
 
 /***/ },
-/* 171 */,
-/* 172 */,
-/* 173 */
+/* 171 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -21557,93 +21760,30 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _reactDom = __webpack_require__(158);
+	var Loading = _react2['default'].createClass({
 
-	var _classnames = __webpack_require__(167);
-
-	var _classnames2 = _interopRequireDefault(_classnames);
-
-	var LazyLoad = _react2['default'].createClass({
-
-	  displayName: 'lazyLoad',
+	  displayName: 'Loading',
 
 	  propTypes: {
-	    children: _react2['default'].PropTypes.node.isRequired,
-	    height: _react2['default'].PropTypes.oneOfType([_react2['default'].PropTypes.string, _react2['default'].PropTypes.number]),
-	    threshold: _react2['default'].PropTypes.number
-	  },
-
-	  getDefaultProps: function getDefaultProps() {
-	    return {
-	      threshold: 0
-	    };
-	  },
-
-	  getInitialState: function getInitialState() {
-	    return {
-	      visible: false
-	    };
-	  },
-
-	  componentDidMount: function componentDidMount() {
-	    window.addEventListener('scroll', this.onWindowScroll);
-	    window.addEventListener('resize', this.onWindowScroll);
-	    this.onWindowScroll();
-	  },
-
-	  componentDidUpdate: function componentDidUpdate() {
-	    if (!this.state.visible) this.onWindowScroll();
-	  },
-
-	  componentWillUnmount: function componentWillUnmount() {
-	    this.onVisible();
-	  },
-
-	  onInvisible: function onInvisible() {
-	    //console.dir(this.props.children)
-	    //console.log(findDOMNode(this.refs[this.props.childRef]))
-	    var ifr = document.getElementById(this.props.childRef + '');
-	    if (ifr !== null) {
-	      var obj = {
-	        'method': 'pause'
-	      };
-	      ifr.contentWindow.postMessage(JSON.stringify(obj), ifr.src);
-	    }
-	  },
-
-	  onWindowScroll: function onWindowScroll() {
-	    var threshold = this.props.threshold;
-
-	    var bounds = (0, _reactDom.findDOMNode)(this).getBoundingClientRect();
-	    var scrollTop = window.pageYOffset;
-	    var top = bounds.top + scrollTop;
-	    var height = bounds.bottom - bounds.top;
-
-	    if (top === 0 || top <= scrollTop + window.innerHeight + threshold && top + height > scrollTop - threshold) {
-	      this.setState({ visible: true });
-	    } else {
-	      this.onInvisible();
-	    }
+	    hide: _react2['default'].PropTypes.bool.isRequired
 	  },
 
 	  render: function render() {
-	    var elStyles = {
-	      height: this.props.height
-	    };
-	    var elClasses = (0, _classnames2['default'])({
-	      'lazy-load': true,
-	      'lazy-load-visible': this.state.visible
-	    });
-
 	    return _react2['default'].createElement(
 	      'div',
-	      { className: elClasses, style: elStyles },
-	      this.state.visible && this.props.children
+	      { className: 'load', style: { display: this.props.hide ? 'none' : 'block' } },
+	      _react2['default'].createElement(
+	        'span',
+	        { className: 'loading' },
+	        'Loading'
+	      ),
+	      _react2['default'].createElement('span', { className: 'loading-spinner' })
 	    );
 	  }
+
 	});
 
-	module.exports = LazyLoad;
+	module.exports = Loading;
 
 /***/ }
 /******/ ]);
