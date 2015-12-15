@@ -25,8 +25,8 @@ const Info = React.createClass({
   },
 
   componentDidMount(){
-    let scrollHeight = ReactDom.findDOMNode(this).scrollHeight
-    if(scrollHeight > this.props.maxHeight){
+    const height = ReactDom.findDOMNode(this).getBoundingClientRect().height
+    if(height > this.props.maxHeight){
       this.setState({
         overFlowHidden: true
       })
